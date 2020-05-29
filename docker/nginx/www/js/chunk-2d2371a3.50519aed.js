@@ -1,0 +1,1 @@
+(window["webpackJsonp"]=window["webpackJsonp"]||[]).push([["chunk-2d2371a3"],{fa4f:function(n,e,t){"use strict";t.r(e);var a=function(){var n=this,e=n.$createElement,t=n._self._c||e;return t("div",{staticClass:"main"})},s=[],c={name:"NetwordConfig"},i=c,o=t("2877"),r=Object(o["a"])(i,a,s,!1,null,"66b583d9",null);e["default"]=r.exports}}]);

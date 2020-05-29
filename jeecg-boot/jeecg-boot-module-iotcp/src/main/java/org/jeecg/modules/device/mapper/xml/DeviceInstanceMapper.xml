@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.device.mapper.DeviceInstanceMapper">
+
+    <!-- 根据模型类型查询实例 -->
+    <select id="getInsDeviceByModelType" resultType="org.jeecg.modules.device.entity.DeviceInstance">
+		SELECT di.* FROM iot_device_instance di, iot_device_model dm WHERE 1=1 and di.model_by=dm.id and dm.type=#{modelType}
+	</select>
+
+    <!-- 根据设备实例的ModelId，获取设备模型 -->
+    <select id="getDeviceModelByModelId" resultType="org.jeecg.modules.device.entity.DeviceModel">
+		SELECT * FROM iot_device_model dm WHERE 1=1 and id=#{modelId}
+	</select>
+
+    <select id="listOnlineInstanceByAddress" resultType="org.jeecg.modules.device.entity.DeviceInstance">
+		SELECT * FROM iot_device_instance WHERE 1=1 and extend_params like concat('%',#{address},'%') and status='online'
+	</select>
+
+</mapper>
