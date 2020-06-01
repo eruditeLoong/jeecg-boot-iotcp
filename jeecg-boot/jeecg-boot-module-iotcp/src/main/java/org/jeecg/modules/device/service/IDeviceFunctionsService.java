@@ -80,7 +80,6 @@ public interface IDeviceFunctionsService extends IService<DeviceFunction> {
      * @param deviceFuncCode
      * @return
      */
-    @Cacheable(value = CacheConstant.IOT_BUILD_FUNC_DATA_STRUCTURE_CACHE)
     public JSONObject buildFuncDataStructure(DeviceFunctionExec functionExec);
 
     /**

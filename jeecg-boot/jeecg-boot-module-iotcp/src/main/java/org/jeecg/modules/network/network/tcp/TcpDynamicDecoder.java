@@ -94,7 +94,8 @@ public class TcpDynamicDecoder extends MessageToMessageDecoder<ByteBuf> {
 
             /////
             byte[] bytes = ByteBufUtil.getBytes(msg);
-            System.out.println(HexConvertUtil.BinaryToHexString(bytes));
+
+            /* 心跳 */
             if (MessageType.HEART.getCode().equals(new String(bytes))) {
                 ReceiveData receiveData = new ReceiveData(
                         MessageType.HEART.getCode(),
@@ -103,42 +104,47 @@ public class TcpDynamicDecoder extends MessageToMessageDecoder<ByteBuf> {
                         System.currentTimeMillis(),
                         null);
                 out.add(receiveData);
-
             } else {
+                /* 数据 */
                 int len = bytes.length;
-                byte address = bytes[0]; // 设备地址
-                int regNum = (bytes[2] >> 4 & 0x0f) * 16 + (bytes[2] & 0x0f); // 寄存器数量
-                // 数据
+                // CRC校验
+
+                /* 报文后两位CRC校验值 */
+                byte[] c = {bytes[len - 2], bytes[len - 1]};
+                String srcCRC = HexConvertUtil.BinaryToHexString(c);
+                /* 报文除CRC校验值之前的数据部分 */
+                byte[] b = new byte[len - 2];
+                System.arraycopy(bytes, 0, b, 0, len - 2);
+
+                /* 报文内容计算CRC字符 */
+                String destCRC = HexConvertUtil.BinaryToHexString(HexConvertUtil.hexStringToBytes(CRCUtil.getCRC(b)));
+                if (!srcCRC.equals(destCRC)) {
+                    log.error("CRC校验错误！");
+                    return;
+                }
+
+                /* 数据字节数量 */
+                int regNum = (bytes[2] >> 4 & 0x0f) * 16 + (bytes[2] & 0x0f);
+
+                /* 传感器数据 */
                 byte[] data = new byte[regNum];
                 System.arraycopy(bytes, 3, data, 0, regNum);
 
-                // 原报文CRC字符
-                byte[] c = {bytes[len - 2], bytes[len - 1]};
-                String srcCRC = HexConvertUtil.BinaryToHexString(c);
-                // 报文内容计算CRC字符
-                byte[] b = new byte[len - 2]; // 数据
-                System.arraycopy(bytes, 0, b, 0, len - 2);
-                String destCRC = HexConvertUtil.BinaryToHexString(HexConvertUtil.hexStringToBytes(CRCUtil.getCRC(b)));
-                if (srcCRC.equals(destCRC) || true) {
-                    JSONObject dJson = new JSONObject();
-                    JSONArray array = new JSONArray();
-                    for (int i = 0; i < regNum - 4; i += 2) { // regNum-4 舍去最高温2位，舍去报警状态2位// FC19
-                        int t = Integer.parseInt(String.valueOf((data[i] & 0xff) * 256 + (data[i + 1] & 0xff)));
-                        if (t == 64537)
-                            continue;
-                        t = t <= 32767 ? t : t - 65536;
-                        Map<String, Object> dataMap = new HashMap<>();
-                        dataMap.put("temperature", t / 10.0);
-                        ReceiveData receiveData = new ReceiveData(
-                                MessageType.REPORT_DATA.getCode(),
-                                deviceModelId,
-                                "device-" + ((i + 2) / 2),
-                                System.currentTimeMillis(),
-                                dataMap);
-                        out.add(receiveData);
-                    }
-                } else {
-                    log.error("CRC校验错误！");
+                for (int i = 0; i < regNum - 4; i += 2) { // regNum-4 舍去最高温2位，舍去报警状态2位// FC19
+                    int t = Integer.parseInt(String.valueOf((data[i] & 0xff) * 256 + (data[i + 1] & 0xff)));
+                    if (t == 64537)
+                        continue;
+                    t = t <= 32767 ? t : t - 65536;
+                    Map<String, Object> dataMap = new HashMap<>();
+                    dataMap.put("temperature", t / 10.0);
+                    ReceiveData receiveData = new ReceiveData(
+                            MessageType.REPORT_DATA.getCode(),
+                            deviceModelId,
+                            "device-" + ((i + 2) / 2),
+                            System.currentTimeMillis(),
+                            dataMap);
+
+                    out.add(receiveData);
                 }
             }
             /////

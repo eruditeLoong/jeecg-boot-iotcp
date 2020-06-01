@@ -50,13 +50,15 @@ public class TcpServerDataDealHandler extends ChannelInboundHandlerAdapter {
                     .eq(DeviceInstance::getStatus, "online")
                     .count();
             if (count == 1) {
-                JSONObject data = dataReportService.verifyBuildData(receiveData.getDeviceModelId(), receiveData.getDataMap());
+                JSONObject data = dataReportService.verifyBuildData(receiveData.getDeviceInstanceId(), receiveData.getDataMap());
 
                 DataReport dataReport = new DataReport();
                 dataReport.setCreateTime(new Date(receiveData.getDatetime()));
                 dataReport.setData(data.toJSONString());
+                // dataReport.setData(receiveData.getDataMap().toString());
                 dataReport.setInputMode("report");
                 dataReport.setInstanceDeviceBy(receiveData.getDeviceInstanceId());
+                log.info(dataReport.toString());
                 dataReportService.save(dataReport);
             }
 

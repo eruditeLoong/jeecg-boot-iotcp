@@ -1,33 +1,18 @@
 package org.jeecg.modules.device.vo;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
+@ToString
 public class DeviceFuncExecConf {
 
     /**
      * corn表达式
      */
     String corn;
-
-    /**
-     * 执行次数
-     * 0：不停止
-     */
-    Integer execTime;
-
-    /**
-     * 是否同步执行
-     * 1、true：同步
-     * 2、false：异步
-     */
-    boolean isSync;
 
     /**
      * 执行模式：

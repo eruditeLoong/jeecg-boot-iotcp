@@ -3,7 +3,9 @@ package org.jeecg.modules.device.service.impl;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelPromise;
 import lombok.extern.slf4j.Slf4j;
 import org.jeecg.common.constant.CacheConstant;
 import org.jeecg.modules.device.entity.*;
@@ -17,6 +19,7 @@ import org.jeecg.modules.network.network.NetworkConnectStore;
 import org.quartz.Scheduler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -24,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -44,6 +48,8 @@ public class DeviceFunctionsServiceImpl extends ServiceImpl<DeviceFunctionsMappe
     private DeviceDataMapper deviceDataMapper;
     @Autowired
     private Scheduler scheduler;
+    @Autowired
+    private ApplicationEventPublisher publisher;
 
     @Override
     public List<DeviceFunction> selectByMainId(String mainId) {
@@ -161,7 +167,7 @@ public class DeviceFunctionsServiceImpl extends ServiceImpl<DeviceFunctionsMappe
      */
     @Override
     @Cacheable(value = CacheConstant.IOT_BUILD_FUNC_DATA_STRUCTURE_CACHE,
-            key = "functionExec.deviceModelId+'-'+functionExec.deviceInstanceId+'-'+functionExec.funcCode")
+            key = "#functionExec.deviceModelId+'-'+#functionExec.deviceInstanceId+'-'+#functionExec.funcCode")
     public JSONObject buildFuncDataStructure(DeviceFunctionExec functionExec) {
         log.info("构建器函数数据结构, 重新缓存。。。");
         DeviceInstance deviceInstance = deviceInstanceMapper.selectById(functionExec.getDeviceInstanceId());
@@ -183,12 +189,23 @@ public class DeviceFunctionsServiceImpl extends ServiceImpl<DeviceFunctionsMappe
         return json;
     }
 
+    /**
+     * 异步执行功能
+     * @param functionExec
+     */
     @Override
     public void execFunctionAsyn(DeviceFunctionExec functionExec) {
         try {
             ChannelHandlerContext channelHandlerContext = getNetworkChannel(functionExec.getDeviceInstanceId());
             if (channelHandlerContext == null) {
                 log.error("没有获取连接通道，终止执行功能！");
+                DeviceInstance deviceInstance = deviceInstanceMapper.selectById(functionExec.getDeviceInstanceId());
+                log.info(deviceInstance.toString());
+                if (deviceInstance != null) {
+                    deviceInstance.setStatus("offline");
+                    publisher.publishEvent(deviceInstance);
+                }
+
                 // String triggerKey = ExecInstanceFunc.class.getCanonicalName() + "-" + deviceFuncCode;
                 // log.info("触发键: {}", triggerKey);
                 // try {
@@ -234,8 +251,11 @@ public class DeviceFunctionsServiceImpl extends ServiceImpl<DeviceFunctionsMappe
 
             log.info("writeJson: {}", writeJson);
             // 发送数据
-            channelHandlerContext.channel().writeAndFlush(writeJson.toJSONString());
-
+            ChannelPromise promise = channelHandlerContext.newPromise();
+            ChannelFuture channelFuture = channelHandlerContext.writeAndFlush(writeJson.toJSONString()).await();
+            promise.await(30, TimeUnit.SECONDS);
+            System.out.println(">>>>>>" + channelFuture.await().toString());
+            return channelFuture.await();
         } catch (Exception e) {
             e.printStackTrace();
         }

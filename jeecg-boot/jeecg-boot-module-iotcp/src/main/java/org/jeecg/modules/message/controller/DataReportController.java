@@ -1,5 +1,6 @@
 package org.jeecg.modules.message.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -10,6 +11,8 @@ import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.aspect.annotation.AutoLog;
 import org.jeecg.common.system.base.controller.JeecgController;
 import org.jeecg.common.system.query.QueryGenerator;
+import org.jeecg.modules.device.entity.DeviceData;
+import org.jeecg.modules.device.mapper.DeviceDataMapper;
 import org.jeecg.modules.message.entity.DataReport;
 import org.jeecg.modules.message.service.IDataReportService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +22,9 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @Description: 设备上传数据
@@ -33,6 +39,8 @@ import java.util.Arrays;
 public class DataReportController extends JeecgController<DataReport, IDataReportService> {
     @Autowired
     private IDataReportService dataService;
+    @Autowired
+    private DeviceDataMapper deviceDataMapper;
 
     /**
      * 分页列表查询
@@ -53,6 +61,25 @@ public class DataReportController extends JeecgController<DataReport, IDataRepor
         QueryWrapper<DataReport> queryWrapper = QueryGenerator.initQueryWrapper(data, req.getParameterMap());
         Page<DataReport> page = new Page<DataReport>(pageNo, pageSize);
         IPage<DataReport> pageList = dataService.page(page, queryWrapper);
+        pageList.setRecords(
+                pageList.getRecords().stream()
+                .flatMap(dataReport -> {
+                    JSONObject dataJson = new JSONObject();
+                    String instanceId = dataReport.getInstanceDeviceBy();
+                    // 根据设备实例id，获取设备的数据节点
+                    List<DeviceData> deviceDataList = deviceDataMapper.listDeviceDataByInstanceId(instanceId);
+                    for(DeviceData deviceData: deviceDataList) {
+                        // dataJson.put("key", deviceData.getCode());
+                        // dataJson.put("name", deviceData.getName());
+                        // dataJson.put("value", JSONObject.parseObject(dataReport.getData()).get(deviceData.getCode()));
+                        // dataJson.put("unit", JSONObject.parseObject(deviceData.getValueType()));
+                        dataJson.put(deviceData.getName(),
+                                JSONObject.parseObject(dataReport.getData()).get(deviceData.getCode()));
+                    }
+                    dataReport.setData(dataJson.toJSONString());
+                    return Stream.of(dataReport);
+                }).collect(Collectors.toList())
+        );
         return Result.ok(pageList);
     }
 

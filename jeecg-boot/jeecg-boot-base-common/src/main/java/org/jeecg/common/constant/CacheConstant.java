@@ -62,4 +62,9 @@ public interface CacheConstant {
 	 * 构建功能数据结构缓存
 	 */
 	public static final String IOT_BUILD_FUNC_DATA_STRUCTURE_CACHE = "iot:cache:function:build:data:structure";
+
+	/**
+	 * 设备实例数据节点
+	 */
+	public static final String IOT_DEVICE_INSTANCE_DATA_NODES_CACHE = "iot:cache:device:instance:data:nodes";
 }

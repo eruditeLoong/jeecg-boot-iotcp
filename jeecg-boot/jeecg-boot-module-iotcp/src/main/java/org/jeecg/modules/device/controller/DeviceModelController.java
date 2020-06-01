@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.SecurityUtils;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.aspect.annotation.AutoLog;
+import org.jeecg.common.constant.CacheConstant;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.system.vo.LoginUser;
 import org.jeecg.common.util.oConvertUtils;
@@ -24,6 +25,8 @@ import org.jeecgframework.poi.excel.entity.ImportParams;
 import org.jeecgframework.poi.excel.view.JeecgEntityExcelView;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -32,10 +35,7 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -60,6 +60,8 @@ public class DeviceModelController {
     @Autowired
     private IDeviceLabelService deviceLabelService;
 
+    @Autowired
+    private RedisTemplate redisTemplate;
     /**
      * 分页列表查询
      *
@@ -88,6 +90,21 @@ public class DeviceModelController {
     public Result<?> listEnum(@RequestParam(name = "enumName") String enumName, HttpServletRequest req) {
 
         return Result.ok();
+    }
+
+    /**
+     * @return
+     * @功能：刷新缓存
+     */
+    @RequestMapping(value = "/refleshCache")
+    public Result<?> refleshCache() {
+        //清空缓存
+        Set keys1 = redisTemplate.keys(CacheConstant.IOT_BUILD_FUNC_DATA_STRUCTURE_CACHE + "*");
+        Set keys2 = redisTemplate.keys(CacheConstant.IOT_DEVICE_INSTANCE_DATA_NODES_CACHE + "*");
+
+        redisTemplate.delete(keys1);
+        redisTemplate.delete(keys2);
+        return Result.ok("刷新缓存成功！");
     }
 
     /**
@@ -392,6 +409,7 @@ public class DeviceModelController {
     @AutoLog(value = "设备模型-通过id删除")
     @ApiOperation(value = "设备模型-通过id删除", notes = "设备模型-通过id删除")
     @DeleteMapping(value = "/delete")
+    @CacheEvict(value = CacheConstant.IOT_DEVICE_INSTANCE_DATA_NODES_CACHE, allEntries = true)
     public Result<?> delete(@RequestParam(name = "id", required = true) String id) {
         deviceModelService.delMain(id);
         return Result.ok("删除成功!");
@@ -406,6 +424,7 @@ public class DeviceModelController {
     @AutoLog(value = "设备模型-批量删除")
     @ApiOperation(value = "设备模型-批量删除", notes = "设备模型-批量删除")
     @DeleteMapping(value = "/deleteBatch")
+    @CacheEvict(value = CacheConstant.IOT_DEVICE_INSTANCE_DATA_NODES_CACHE, allEntries = true)
     public Result<?> deleteBatch(@RequestParam(name = "ids", required = true) String ids) {
         this.deviceModelService.delBatchMain(Arrays.asList(ids.split(",")));
         return Result.ok("批量删除成功！");

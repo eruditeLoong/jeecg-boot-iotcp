@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.jeecg.common.aspect.annotation.Dict;
+import org.jeecg.modules.device.vo.DeviceFuncExecConf;
 import org.jeecgframework.poi.excel.annotation.Excel;
 
 import java.io.Serializable;
@@ -72,6 +73,14 @@ public class DeviceFunction implements Serializable {
     @Excel(name = "输出数据", width = 150)
     @ApiModelProperty(value = "输出数据")
     private java.lang.String outputData;
+
+    /**
+     * 功能执行配置
+     */
+    @Excel(name = "功能执行配置", width = 150)
+    @ApiModelProperty(value = "功能执行配置")
+    private DeviceFuncExecConf execConfig;
+
     /**
      * 描述
      */
