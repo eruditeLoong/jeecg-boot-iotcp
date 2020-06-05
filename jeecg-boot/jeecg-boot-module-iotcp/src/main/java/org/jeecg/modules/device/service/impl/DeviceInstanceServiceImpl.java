@@ -1,5 +1,6 @@
 package org.jeecg.modules.device.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
@@ -7,10 +8,15 @@ import org.jeecg.common.system.api.ISysBaseAPI;
 import org.jeecg.modules.device.entity.DeviceInstance;
 import org.jeecg.modules.device.entity.DeviceModel;
 import org.jeecg.modules.device.mapper.DeviceInstanceMapper;
+import org.jeecg.modules.device.quartzJob.ExecInstanceFunc;
 import org.jeecg.modules.device.service.IDeviceInstanceService;
+import org.jeecg.modules.device.vo.DeviceFuncExecConf;
+import org.jeecg.modules.device.vo.DeviceFunctionExec;
 import org.jeecg.modules.network.network.NetworkConnect;
 import org.jeecg.modules.network.network.NetworkConnectStore;
+import org.quartz.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -32,6 +38,11 @@ public class DeviceInstanceServiceImpl extends ServiceImpl<DeviceInstanceMapper,
     private DeviceInstanceMapper deviceInstanceMapper;
     @Autowired
     private ISysBaseAPI sysBaseAPI;
+
+    @Autowired
+    private Scheduler scheduler;
+    @Autowired
+    private ApplicationEventPublisher publisher;
 
     @Override
     public List<DeviceInstance> listInstanceDeviceByModelType(String modelType) {
@@ -136,4 +147,73 @@ public class DeviceInstanceServiceImpl extends ServiceImpl<DeviceInstanceMapper,
         }
     }
 
+    @Override
+    public void setFuncExecConf(DeviceFunctionExec deviceFunctionExec, boolean isRunning) {
+        String deviceInstanceId = deviceFunctionExec.getDeviceInstanceId();
+        DeviceInstance deviceInstance = this.getById(deviceInstanceId);
+        DeviceFuncExecConf deviceFuncExecConf = new DeviceFuncExecConf(
+                deviceFunctionExec.getExecConfig().getCorn(),
+                deviceFunctionExec.getExecConfig().getExecMode(),
+                isRunning);
+
+        JSONObject json = new JSONObject();
+        json = JSONObject.parseObject(deviceInstance.getFuncExecConf());
+        json.put(deviceFunctionExec.getFuncCode(), deviceFuncExecConf);
+
+        deviceInstance.setFuncExecConf(json.toJSONString());
+        log.info("更新执行配置：{}", this.updateById(deviceInstance));
+
+    }
+
+    /**
+     * 删除执行任务
+     *
+     * @param functionExec
+     */
+    @Override
+    public void deleteExecJob(DeviceFunctionExec functionExec) {
+        try {
+            String triggerKey = ExecInstanceFunc.class.getCanonicalName()
+                    + "-" + functionExec.getDeviceInstanceId()
+                    + "-" + functionExec.getFuncCode();
+            scheduler.pauseTrigger(TriggerKey.triggerKey(triggerKey));
+            scheduler.unscheduleJob(TriggerKey.triggerKey(triggerKey));
+            scheduler.deleteJob(JobKey.jobKey(triggerKey));
+            // scheduler.clear();
+        } catch (Exception e) {
+            this.setFuncExecConf(functionExec, false);
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 添加执行任务
+     *
+     * @param functionExec
+     */
+    @Override
+    public void addExecJob(DeviceFunctionExec functionExec) {
+        try {
+            String triggerKey = ExecInstanceFunc.class.getCanonicalName() + "-" + functionExec.getDeviceInstanceId() + "-" + functionExec.getFuncCode();
+            scheduler.start();
+            // 构建job信息
+            JobDetail jobDetail = JobBuilder
+                    .newJob(ExecInstanceFunc.class)
+                    .withIdentity(triggerKey)
+                    .usingJobData("deviceInstanceId", functionExec.getDeviceInstanceId())
+                    .usingJobData("deviceModelId", functionExec.getDeviceModelId())
+                    .usingJobData("deviceFuncCode", functionExec.getFuncCode())
+                    .build();
+
+            // 表达式调度构建器(即任务执行的时间)
+            CronScheduleBuilder scheduleBuilder = CronScheduleBuilder.cronSchedule(functionExec.getExecConfig().getCorn());
+            // 按新的cronExpression表达式构建一个新的trigger
+            CronTrigger trigger = TriggerBuilder.newTrigger().withIdentity(triggerKey).withSchedule(scheduleBuilder).build();
+            scheduler.scheduleJob(jobDetail, trigger);
+            this.setFuncExecConf(functionExec, true);
+        } catch (Exception e) {
+            this.setFuncExecConf(functionExec, false);
+            e.printStackTrace();
+        }
+    }
 }

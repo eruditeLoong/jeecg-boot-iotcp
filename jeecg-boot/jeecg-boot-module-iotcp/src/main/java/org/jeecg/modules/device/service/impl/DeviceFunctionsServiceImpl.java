@@ -1,25 +1,36 @@
 package org.jeecg.modules.device.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelProgressivePromise;
 import io.netty.channel.ChannelPromise;
 import lombok.extern.slf4j.Slf4j;
 import org.jeecg.common.constant.CacheConstant;
 import org.jeecg.modules.device.entity.*;
+import org.jeecg.modules.device.enums.FuncExecMode;
 import org.jeecg.modules.device.mapper.DeviceDataMapper;
 import org.jeecg.modules.device.mapper.DeviceFunctionsMapper;
 import org.jeecg.modules.device.mapper.DeviceInstanceMapper;
+import org.jeecg.modules.device.quartzJob.ExecInstanceFunc;
 import org.jeecg.modules.device.service.IDeviceFunctionsService;
+import org.jeecg.modules.device.service.IDeviceInstanceService;
 import org.jeecg.modules.device.vo.DeviceFunctionExec;
+import org.jeecg.modules.message.entity.function.FunctionInputStructure;
+import org.jeecg.modules.message.entity.function.FunctionStructure;
 import org.jeecg.modules.network.network.NetworkConnect;
 import org.jeecg.modules.network.network.NetworkConnectStore;
-import org.quartz.Scheduler;
+import org.jeecg.modules.network.network.tcp.future.SyncWrite;
+import org.jeecg.modules.network.network.tcp.msg.Request;
+import org.jeecg.modules.network.network.tcp.msg.Response;
+import org.quartz.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -29,6 +40,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @Description: 功能定义
@@ -39,7 +51,6 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class DeviceFunctionsServiceImpl extends ServiceImpl<DeviceFunctionsMapper, DeviceFunction> implements IDeviceFunctionsService {
-
     @Autowired
     private DeviceFunctionsMapper deviceFunctionsMapper;
     @Autowired
@@ -50,6 +61,8 @@ public class DeviceFunctionsServiceImpl extends ServiceImpl<DeviceFunctionsMappe
     private Scheduler scheduler;
     @Autowired
     private ApplicationEventPublisher publisher;
+    @Autowired
+    private FunctionData functionData;
 
     @Override
     public List<DeviceFunction> selectByMainId(String mainId) {
@@ -158,38 +171,6 @@ public class DeviceFunctionsServiceImpl extends ServiceImpl<DeviceFunctionsMappe
     }
 
     /**
-     * 构建函数数据结构
-     *
-     * @param deviceModelId
-     * @param deviceInstanceId
-     * @param deviceFuncCode
-     * @return
-     */
-    @Override
-    @Cacheable(value = CacheConstant.IOT_BUILD_FUNC_DATA_STRUCTURE_CACHE,
-            key = "#functionExec.deviceModelId+'-'+#functionExec.deviceInstanceId+'-'+#functionExec.funcCode")
-    public JSONObject buildFuncDataStructure(DeviceFunctionExec functionExec) {
-        log.info("构建器函数数据结构, 重新缓存。。。");
-        DeviceInstance deviceInstance = deviceInstanceMapper.selectById(functionExec.getDeviceInstanceId());
-        List<DeviceFunction> deviceFunctionList =
-                this.getFuncWithParamValue(functionExec.getDeviceModelId(), functionExec.getDeviceInstanceId(), deviceInstance.getExtendParams())
-                        .stream()
-                        .filter(deviceFunction -> deviceFunction.getCode().equals(functionExec.getFuncCode()))
-                        .collect(Collectors.toList());
-
-        DeviceFunction deviceFunction = deviceFunctionList.get(0);
-
-        JSONObject json = new JSONObject();
-        json.put("id", deviceFunction.getId());
-        json.put("name", deviceFunction.getName());
-        json.put("code", deviceFunction.getCode());
-        json.put("inputs", JSONArray.parseArray(deviceFunction.getInputParams().replaceAll("\\\\", "")));
-        json.put("output", deviceFunction.getOutputData());
-
-        return json;
-    }
-
-    /**
      * 异步执行功能
      * @param functionExec
      */
@@ -222,7 +203,7 @@ public class DeviceFunctionsServiceImpl extends ServiceImpl<DeviceFunctionsMappe
             JSONObject writeJson = new JSONObject();
             writeJson.put("deviceInstanceId", functionExec.getDeviceInstanceId());
             writeJson.put("deviceModelId", functionExec.getDeviceModelId());
-            writeJson.put("function", buildFuncDataStructure(functionExec));
+            writeJson.put("function", functionData.buildFuncDataStructure(functionExec));
 
             log.info("writeJson: {}", writeJson);
             // 发送数据
@@ -234,6 +215,11 @@ public class DeviceFunctionsServiceImpl extends ServiceImpl<DeviceFunctionsMappe
 
     }
 
+    /**
+     * 同步执行功能
+     * @param functionExec
+     * @return
+     */
     @Override
     public Object execFunctionSync(DeviceFunctionExec functionExec) {
         try {
@@ -247,15 +233,15 @@ public class DeviceFunctionsServiceImpl extends ServiceImpl<DeviceFunctionsMappe
             JSONObject writeJson = new JSONObject();
             writeJson.put("deviceInstanceId", functionExec.getDeviceInstanceId());
             writeJson.put("deviceModelId", functionExec.getDeviceModelId());
-            writeJson.put("function", buildFuncDataStructure(functionExec));
+
+            writeJson.put("function", functionData.buildFuncDataStructure(functionExec).toJsonString());
 
             log.info("writeJson: {}", writeJson);
+
             // 发送数据
-            ChannelPromise promise = channelHandlerContext.newPromise();
-            ChannelFuture channelFuture = channelHandlerContext.writeAndFlush(writeJson.toJSONString()).await();
-            promise.await(30, TimeUnit.SECONDS);
-            System.out.println(">>>>>>" + channelFuture.await().toString());
-            return channelFuture.await();
+            ChannelFuture channelFuture = channelHandlerContext.channel().writeAndFlush(writeJson.toJSONString());
+
+            return "555555";
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -313,4 +299,71 @@ public class DeviceFunctionsServiceImpl extends ServiceImpl<DeviceFunctionsMappe
             return getParantGateway(deviceInstance.getParentBy());
         }
     }
+}
+
+@Slf4j
+@Component
+class FunctionData{
+    @Autowired
+    private DeviceInstanceMapper deviceInstanceMapper;
+    @Autowired
+    private IDeviceFunctionsService deviceFunctionsService;
+
+    /**
+     * 构建函数数据结构
+     * @param functionExec
+     * @return
+     */
+    @Cacheable(value = CacheConstant.IOT_BUILD_FUNC_DATA_STRUCTURE_CACHE,
+            key = "#functionExec.deviceModelId+'-'+#functionExec.deviceInstanceId+'-'+#functionExec.funcCode")
+    public FunctionStructure buildFuncDataStructure(DeviceFunctionExec functionExec) {
+        log.info("构建器函数数据结构, 重新缓存。。。");
+
+        DeviceInstance deviceInstance = deviceInstanceMapper.selectById(functionExec.getDeviceInstanceId());
+        List<DeviceFunction> deviceFunctionList =
+                deviceFunctionsService.getFuncWithParamValue(functionExec.getDeviceModelId(), functionExec.getDeviceInstanceId(), deviceInstance.getExtendParams())
+                        .stream()
+                        .filter(deviceFunction -> deviceFunction.getCode().equals(functionExec.getFuncCode()))
+                        .collect(Collectors.toList());
+
+        DeviceFunction deviceFunction = deviceFunctionList.get(0);
+
+        JSONArray inputArray = JSONArray.parseArray(deviceFunction.getInputParams().replaceAll("\\\\", ""));
+
+        List<FunctionInputStructure> inputStructures = inputArray.stream()
+                .flatMap(object -> {
+                    JSONObject json = (JSONObject) object;
+                    FunctionInputStructure inputStructure = new FunctionInputStructure(
+                            json.getString("id"),
+                            json.getString("code"),
+                            json.getString("name"),
+                            json.getString("inputMode"),
+                            json.getJSONObject("valueType"),
+                            json.getString("deviceModelId"),
+                            json.getString("rwAuthor"),
+                            json.getString("value")
+                    );
+                    System.out.println(inputStructure.toString());
+                    return Stream.of(inputStructure);
+                }).collect(Collectors.toList());
+
+        FunctionStructure functionStructure = new FunctionStructure(
+                deviceFunction.getId(),
+                deviceFunction.getName(),
+                deviceFunction.getCode(),
+                inputStructures,
+                deviceFunction.getOutputData());
+
+
+        // JSONObject json = new JSONObject();
+        // json.put("id", deviceFunction.getId());
+        // json.put("name", deviceFunction.getName());
+        // json.put("code", deviceFunction.getCode());
+        // json.put("inputs", JSONArray.parseArray(deviceFunction.getInputParams().replaceAll("\\\\", "")));
+        // json.put("output", deviceFunction.getOutputData());
+
+        return functionStructure;
+    }
+
+
 }

@@ -1,7 +1,5 @@
 package org.jeecg.modules.network.network.tcp;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.zhouwr.protocol.DataProtocolProvider;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
@@ -9,7 +7,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
 import lombok.extern.slf4j.Slf4j;
-import org.jeecg.modules.message.entity.ReceiveData;
+import org.jeecg.modules.message.entity.ReceiveMessage;
 import org.jeecg.modules.message.enums.MessageType;
 import org.jeecg.modules.network.network.NetworkConnect;
 import org.jeecg.modules.network.network.NetworkConnectStore;
@@ -97,13 +95,13 @@ public class TcpDynamicDecoder extends MessageToMessageDecoder<ByteBuf> {
 
             /* 心跳 */
             if (MessageType.HEART.getCode().equals(new String(bytes))) {
-                ReceiveData receiveData = new ReceiveData(
+                ReceiveMessage receiveMessage = new ReceiveMessage(
                         MessageType.HEART.getCode(),
                         deviceModelId,
                         deviceInstanceId,
                         System.currentTimeMillis(),
                         null);
-                out.add(receiveData);
+                out.add(receiveMessage.toJSONString());
             } else {
                 /* 数据 */
                 int len = bytes.length;
@@ -137,14 +135,14 @@ public class TcpDynamicDecoder extends MessageToMessageDecoder<ByteBuf> {
                     t = t <= 32767 ? t : t - 65536;
                     Map<String, Object> dataMap = new HashMap<>();
                     dataMap.put("temperature", t / 10.0);
-                    ReceiveData receiveData = new ReceiveData(
-                            MessageType.REPORT_DATA.getCode(),
+                    ReceiveMessage receiveMessage = new ReceiveMessage(
+                            MessageType.DATA.getCode(),
                             deviceModelId,
                             "device-" + ((i + 2) / 2),
                             System.currentTimeMillis(),
                             dataMap);
 
-                    out.add(receiveData);
+                    out.add(receiveMessage.toJSONString());
                 }
             }
             /////

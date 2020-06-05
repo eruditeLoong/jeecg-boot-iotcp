@@ -1,24 +1,23 @@
 package org.jeecg.modules.message.entity;
 
 import lombok.*;
+import org.jeecg.modules.device.entity.DeviceData;
 
-import java.util.Map;
+import java.util.List;
 
 /**
  * @program: jeecg-boot-module-iot
- * @description: 网络入栈数据类
+ * @description: 网络发送数据
  * @author: zhouwr
- * @create: 2020-05-26 15:09
+ * @create: 2020-05-26 16:34
  * @version：1.0
  **/
-
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class ReceiveData {
-
+public class SendMessage {
     /**
      * 消息类型
      */
@@ -35,13 +34,12 @@ public class ReceiveData {
     private String deviceInstanceId;
 
     /**
-     * 接收时间
+     * 发送时间
      */
     private long datetime;
 
     /**
      * 设备数据节点
      */
-    Map<String, Object> dataMap;
-
+    private List<DeviceData> deviceDataList;
 }

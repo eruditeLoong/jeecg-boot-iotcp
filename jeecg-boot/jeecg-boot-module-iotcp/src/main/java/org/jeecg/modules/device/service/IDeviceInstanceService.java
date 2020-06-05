@@ -3,6 +3,7 @@ package org.jeecg.modules.device.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import io.netty.channel.ChannelHandlerContext;
 import org.jeecg.modules.device.entity.DeviceInstance;
+import org.jeecg.modules.device.vo.DeviceFunctionExec;
 
 import java.util.List;
 
@@ -47,4 +48,22 @@ public interface IDeviceInstanceService extends IService<DeviceInstance> {
      */
     public DeviceInstance getParantGateway(String instanceId);
 
+    /**
+     * 设置实例设备的功能执行配置信息
+     * @param deviceFunctionExec
+     * @param isRunning
+     */
+    public void setFuncExecConf(DeviceFunctionExec deviceFunctionExec, boolean isRunning);
+
+    /**
+     * 删除执行任务
+     * @param functionExec
+     */
+    public void deleteExecJob(DeviceFunctionExec functionExec);
+
+    /**
+     * 添加执行任务
+     * @param functionExec
+     */
+    public void addExecJob(DeviceFunctionExec functionExec);
 }

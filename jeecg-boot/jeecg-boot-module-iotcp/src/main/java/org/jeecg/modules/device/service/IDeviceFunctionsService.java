@@ -73,16 +73,6 @@ public interface IDeviceFunctionsService extends IService<DeviceFunction> {
     public List<DeviceFunction> getFuncWithParamValue(String deviceModelId, String deviceInstanceId, String deviceInstanceExtendParams);
 
     /**
-     * 构建器函数数据结构
-     *
-     * @param deviceModelId
-     * @param deviceInstanceId
-     * @param deviceFuncCode
-     * @return
-     */
-    public JSONObject buildFuncDataStructure(DeviceFunctionExec functionExec);
-
-    /**
      * 异步执行功能
      *
      * @param deviceModelId

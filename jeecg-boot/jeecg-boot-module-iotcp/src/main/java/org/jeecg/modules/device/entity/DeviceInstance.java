@@ -1,5 +1,6 @@
 package org.jeecg.modules.device.entity;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -10,6 +11,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 import org.jeecg.common.aspect.annotation.Dict;
+import org.jeecg.common.util.oConvertUtils;
+import org.jeecg.modules.device.vo.DeviceFuncExecConf;
 import org.jeecgframework.poi.excel.annotation.Excel;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -64,7 +67,7 @@ public class DeviceInstance implements Serializable {
     /**
      * 所属机构
      */
-    @Excel(name = "所属机构", width = 15, dictTable = "iot_org", dicText = "name", dicCode = "id")
+    @Excel(name = "所属机构", width = 15, dictTable = "sys_depart", dicText = "depart_name", dicCode = "id")
     @Dict(dictTable = "sys_depart", dicText = "depart_name", dicCode = "id")
     @ApiModelProperty(value = "所属机构")
     private java.lang.String orgBy;
@@ -115,4 +118,5 @@ public class DeviceInstance implements Serializable {
     @ApiModelProperty(value = "说明")
     private java.lang.String description;
 
+    private java.lang.String funcExecConf;
 }

@@ -1,9 +1,10 @@
 package org.jeecg.modules.device.vo;
 
+import com.alibaba.fastjson.JSONObject;
 import lombok.*;
+import org.jeecg.common.util.oConvertUtils;
+import org.jeecg.modules.device.entity.DeviceInstance;
 
-@AllArgsConstructor
-@NoArgsConstructor
 @Getter
 @Setter
 @ToString
@@ -25,4 +26,37 @@ public class DeviceFuncExecConf {
      * 执行状态
      */
     boolean isRunning;
+
+    public DeviceFuncExecConf(){
+        super();
+    }
+
+    public DeviceFuncExecConf(String corn, String execMode, boolean isRunning) {
+        this.corn = corn;
+        this.execMode = execMode;
+        this.isRunning = isRunning;
+    }
+
+    /**
+     * 从设备实例的所有功能执行配置中，根据功能编码，构造设备特定功能配置
+     * @param deviceFuncExecConf
+     * @param deviceFuncCode
+     */
+    public DeviceFuncExecConf(String deviceFuncExecConf, String deviceFuncCode){
+        super();
+        JSONObject json = JSONObject.parseObject(
+                oConvertUtils.isEmpty(deviceFuncExecConf) ? "{}" : deviceFuncExecConf
+        ).getJSONObject(deviceFuncCode);
+
+        if(json == null)
+            json = new JSONObject();
+
+        String execMode = oConvertUtils.isEmpty(json.getString("execMode")) ? "task" : json.getString("execMode");
+        String corn = oConvertUtils.isEmpty(json.getString("corn")) ? "* * * * ? *" : json.getString("corn");
+        Boolean isRunning = json.getBoolean("running") == null ? false : json.getBoolean("running");
+
+        this.isRunning = isRunning;
+        this.execMode = execMode;
+        this.corn = corn;
+    }
 }

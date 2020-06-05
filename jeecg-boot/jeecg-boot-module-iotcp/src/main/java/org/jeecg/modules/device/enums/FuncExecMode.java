@@ -1,5 +1,4 @@
-package org.jeecg.modules.message.enums;
-
+package org.jeecg.modules.device.enums;
 
 import com.alibaba.fastjson.annotation.JSONType;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -10,13 +9,10 @@ import lombok.Getter;
 @Getter
 @JSONType(serializeEnumAsJavaBean = true)
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
-public enum MessageType {
+public enum FuncExecMode {
 
-    HEART("心跳", "heart"),
-    DATA("数据", "data"),
-    FUNCTION("功能", "function"),
-    EVENT("事件", "event"),
-    OTHER("其它", "other");
+    TASK("任务", "task"),
+    DEBUG("调试", "debug");
 
     private String name;
     private String code;
