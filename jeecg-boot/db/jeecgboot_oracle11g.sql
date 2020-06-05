@@ -2088,7 +2088,7 @@ COMMENT ON TABLE "JEECGBOOT"."SYS_ANNOUNCEMENT" IS '系统通告表';
 -- ----------------------------
 INSERT INTO "JEECGBOOT"."SYS_ANNOUNCEMENT" VALUES ('1256486502931722242', 'JeecgBoot 2.2.0版本发布', '<h5 id="h5_5" style="box-sizing: inherit; font-family: ''PingFang SC'', ''Helvetica Neue'', ''Microsoft YaHei UI'', ''Microsoft YaHei'', ''Noto Sans CJK SC'', Sathu, EucrosiaUPC, Arial, Helvetica, sans-serif; line-height: 1.8; margin: 22px 0px 16px; padding: 0px; font-size: 18px; border: none; color: #333333; background-color: #ffffff;">升级不兼容</h5>
 <ul style="box-sizing: inherit; margin: 0px 0px 20px; padding: 0px 0px 0px 20px; color: #333333; font-family: -apple-system, BlinkMacSystemFont, ''Apple Color Emoji'', ''Segoe UI Emoji'', ''Segoe UI Symbol'', ''Segoe UI'', ''PingFang SC'', ''Hiragino Sans GB'', ''Microsoft YaHei'', ''Helvetica Neue'', Helvetica, Arial, sans-serif; font-size: 16px; background-color: #ffffff;">
-<li style="box-sizing: inherit; line-height: 1.875em; margin-top: 0px;">1、升级 ant-design-vue 到最新版本 1.5.2，会导致使用disabled的组件不可用（需要全局替换disabled 为readOnly；另外原来readOnly不允许全小写）</li>
+<li style="box-sizing: inherit; line-height: 1.875em; margin-top: 0px;">1、升级 ant-design-scene 到最新版本 1.5.2，会导致使用disabled的组件不可用（需要全局替换disabled 为readOnly；另外原来readOnly不允许全小写）</li>
 <li style="box-sizing: inherit; line-height: 1.875em;">2、JSearchSelectTag.vue行编辑的popup传参做了修改，需要全局替换 orgFieldse 为 orgFields</li>
 <li style="box-sizing: inherit; line-height: 1.875em;">3、 项目删除了sass，全部换成 less，其中涉及/deep/语法得改造</li>
 <li style="box-sizing: inherit; line-height: 1.875em; margin-bottom: 0px;">4、 Online表单的填值规则用法修改了&nbsp;<a style="box-sizing: inherit; background-color: transparent; color: #4183c4; text-decoration-line: none;" href="http://doc.jeecg.com/1630378">文档</a></li>
@@ -2098,7 +2098,7 @@ INSERT INTO "JEECGBOOT"."SYS_ANNOUNCEMENT" VALUES ('1256486502931722242', 'Jeecg
 <li style="box-sizing: inherit; line-height: 1.875em; margin-top: 0px;">登录的时候一次性加载系统字典，进行前端缓存，减少ajax重复请求</li>
 <li style="box-sizing: inherit; line-height: 1.875em;">修改定时任务quartz配置</li>
 <li style="box-sizing: inherit; line-height: 1.875em;">logback-spring.xml配置不按照日期和大小生成新日志文件问题修复</li>
-<li style="box-sizing: inherit; line-height: 1.875em;">vue-cli3 编译打包进行zip压缩优化</li>
+<li style="box-sizing: inherit; line-height: 1.875em;">scene-cli3 编译打包进行zip压缩优化</li>
 <li style="box-sizing: inherit; line-height: 1.875em;">根据index.html页面window._CONFIG[''domianURL'']，指定 axios的 baseURL（所以vue的代理没有用了）</li>
 <li style="box-sizing: inherit; line-height: 1.875em;">JEditableTable重构，新增获取值时应该把临时id去掉、行编辑修改不直接更改数据源的ID</li>
 <li style="box-sizing: inherit; line-height: 1.875em; margin-bottom: 0px;">Online模块重点优化升级、Online代码生成器重点优化升级</li>
@@ -2194,14 +2194,14 @@ INSERT INTO "JEECGBOOT"."SYS_ANNOUNCEMENT" VALUES ('1256486502931722242', 'Jeecg
 </ul>
 <h5 id="h5_10" style="box-sizing: inherit; font-family: ''PingFang SC'', ''Helvetica Neue'', ''Microsoft YaHei UI'', ''Microsoft YaHei'', ''Noto Sans CJK SC'', Sathu, EucrosiaUPC, Arial, Helvetica, sans-serif; line-height: 1.8; margin: 22px 0px 16px; padding: 0px; font-size: 18px; border: none; color: #333333; background-color: #ffffff;">UI组件升级</h5>
 <ul style="box-sizing: inherit; margin: 0px 0px 20px; padding: 0px 0px 0px 20px; color: #333333; font-family: -apple-system, BlinkMacSystemFont, ''Apple Color Emoji'', ''Segoe UI Emoji'', ''Segoe UI Symbol'', ''Segoe UI'', ''PingFang SC'', ''Hiragino Sans GB'', ''Microsoft YaHei'', ''Helvetica Neue'', Helvetica, Arial, sans-serif; font-size: 16px; background-color: #ffffff;">
-<li style="box-sizing: inherit; line-height: 1.875em; margin-top: 0px;">升级 ant-design-vue 为最新版本 1.5.2</li>
+<li style="box-sizing: inherit; line-height: 1.875em; margin-top: 0px;">升级 ant-design-scene 为最新版本 1.5.2</li>
 <li style="box-sizing: inherit; line-height: 1.875em;">登录验证码获取失败的时候，不显示空白</li>
-<li style="box-sizing: inherit; line-height: 1.875em;">升级 ant-design-vue，JModal切换全屏按钮因ant升级错位问题修复</li>
+<li style="box-sizing: inherit; line-height: 1.875em;">升级 ant-design-scene，JModal切换全屏按钮因ant升级错位问题修复</li>
 <li style="box-sizing: inherit; line-height: 1.875em;">简化 j-modal 的相关代码</li>
 <li style="box-sizing: inherit; line-height: 1.875em;">封装常用组件示例；JInput新增当 type 变化的时候重新计算值</li>
 <li style="box-sizing: inherit; line-height: 1.875em;">markdown集成</li>
 <li style="box-sizing: inherit; line-height: 1.875em;">富文本支持minio上传</li>
-<li style="box-sizing: inherit; line-height: 1.875em;">选择用户组件列表样式错位；Ellipsis.vue 优化</li>
+<li style="box-sizing: inherit; line-height: 1.875em;">选择用户组件列表样式错位；Ellipsis.scene 优化</li>
 <li style="box-sizing: inherit; line-height: 1.875em;">JModal移动端全屏效果</li>
 <li style="box-sizing: inherit; line-height: 1.875em;">高级查询只有在 in 模式下才能多选</li>
 <li style="box-sizing: inherit; line-height: 1.875em;">自定义选择用户组件JSelectMultiUser的宽度和截取显示长度</li>
@@ -2209,7 +2209,7 @@ INSERT INTO "JEECGBOOT"."SYS_ANNOUNCEMENT" VALUES ('1256486502931722242', 'Jeecg
 <li style="box-sizing: inherit; line-height: 1.875em;">JEditableTable重构 行编辑新增合计功能</li>
 <li style="box-sizing: inherit; line-height: 1.875em;">JEditableTable重构 行编辑Popup请求数量过多（加缓存机制）</li>
 <li style="box-sizing: inherit; line-height: 1.875em;">JEditableTable重构,行编辑InputNumber扩展支持输入小数和负数</li>
-<li style="box-sizing: inherit; line-height: 1.875em;">JEditableTable.vue disable模式禁用添加删除按钮</li>
+<li style="box-sizing: inherit; line-height: 1.875em;">JEditableTable.scene disable模式禁用添加删除按钮</li>
 <li style="box-sizing: inherit; line-height: 1.875em;">JEditableTable行编辑， popup返回值，时间赋值有问题</li>
 <li style="box-sizing: inherit; line-height: 1.875em;">JEditableTable行编辑，日期控件显示错位问题</li>
 <li style="box-sizing: inherit; line-height: 1.875em;">高级查询移动自适应效果；</li>
@@ -2222,7 +2222,7 @@ INSERT INTO "JEECGBOOT"."SYS_ANNOUNCEMENT" VALUES ('1256486502931722242', 'Jeecg
 <li style="box-sizing: inherit; line-height: 1.875em;">JPopup列表数据不刷新问题</li>
 <li style="box-sizing: inherit; line-height: 1.875em;">JSearchSelectTag.vue匹配不上数字值问题</li>
 <li style="box-sizing: inherit; line-height: 1.875em;">JSelectUserByDep 根据部门选择人组件bug</li>
-<li style="box-sizing: inherit; line-height: 1.875em;">JTreeDict.vue 分类字典组件 清空不了问题</li>
+<li style="box-sizing: inherit; line-height: 1.875em;">JTreeDict.scene 分类字典组件 清空不了问题</li>
 <li style="box-sizing: inherit; line-height: 1.875em;">常用示例，新增搜索下拉 JSearchSelectTag.vue例子</li>
 <li style="box-sizing: inherit; line-height: 1.875em;">常用示例，新增如何关闭当前页面例子</li>
 <li style="box-sizing: inherit; line-height: 1.875em;">常用示例，省市区三级联动的例子</li>

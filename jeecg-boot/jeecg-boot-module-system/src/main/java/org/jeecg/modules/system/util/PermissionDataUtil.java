@@ -33,8 +33,8 @@ public class PermissionDataUtil {
 			if (component.startsWith("src/views/")) {
 				component = component.replaceFirst("src/views/", "");
 			}
-			if (component.endsWith(".vue")) {
-				component = component.replace(".vue", "");
+			if (component.endsWith(".scene")) {
+				component = component.replace(".scene", "");
 			}
 			permission.setComponent(component);
 		}
@@ -42,8 +42,8 @@ public class PermissionDataUtil {
 		// 请求URL
 		if (oConvertUtils.isNotEmpty(permission.getUrl())) {
 			String url = permission.getUrl();
-			if (url.endsWith(".vue")) {
-				url = url.replace(".vue", "");
+			if (url.endsWith(".scene")) {
+				url = url.replace(".scene", "");
 			}
 			if (!url.startsWith("http") && !url.startsWith("/")&&!url.trim().startsWith("{{")) {
 				url = "/" + url;
