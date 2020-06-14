@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
 import org.jeecg.common.system.api.ISysBaseAPI;
+import org.jeecg.common.util.oConvertUtils;
 import org.jeecg.modules.device.entity.DeviceInstance;
 import org.jeecg.modules.device.entity.DeviceModel;
 import org.jeecg.modules.device.mapper.DeviceInstanceMapper;
@@ -20,9 +21,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @Description: 设备实例
@@ -214,6 +213,30 @@ public class DeviceInstanceServiceImpl extends ServiceImpl<DeviceInstanceMapper,
         } catch (Exception e) {
             this.setFuncExecConf(functionExec, false);
             e.printStackTrace();
+        }
+    }
+
+    @Override
+    public List<DeviceInstance> listInstanceChild(String id) {
+        List<DeviceInstance> list = this.list();
+        List<DeviceInstance> out = new ArrayList<DeviceInstance>();
+        this.getInstanceChild(out, list, id);
+        return out;
+    }
+
+    private void getInstanceChild(List<DeviceInstance> outList, List<DeviceInstance> list, String id){
+        Iterator<DeviceInstance> iterator = list.iterator();
+        while(iterator.hasNext()){
+            DeviceInstance instance = iterator.next();
+            if(id.equals(instance.getParentBy())){
+                // iterator.remove();   //注意这个地方
+                // list.remove(instance);
+                List<DeviceInstance> list1 = new ArrayList<>();
+                list1.addAll(list);
+                list1.remove(instance);
+                outList.add(instance);
+                getInstanceChild(outList, list1, instance.getId());
+            }
         }
     }
 }

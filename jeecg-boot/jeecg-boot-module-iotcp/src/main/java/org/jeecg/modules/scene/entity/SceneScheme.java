@@ -65,7 +65,7 @@ public class SceneScheme implements Serializable {
     @Excel(name = "方案状态", width = 15, dicCode = "valid_status")
     @Dict(dicCode = "valid_status")
     @ApiModelProperty(value = "方案状态")
-    private java.lang.Integer statue;
+    private java.lang.Integer status;
     /**
      * 创建人
      */

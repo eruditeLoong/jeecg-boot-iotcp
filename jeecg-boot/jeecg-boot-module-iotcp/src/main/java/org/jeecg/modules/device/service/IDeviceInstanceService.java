@@ -66,4 +66,11 @@ public interface IDeviceInstanceService extends IService<DeviceInstance> {
      * @param functionExec
      */
     public void addExecJob(DeviceFunctionExec functionExec);
+
+    /**
+     * 获取子实例列表，根据实例id
+     * @param id
+     * @return
+     */
+    public List<DeviceInstance> listInstanceChild(String id);
 }

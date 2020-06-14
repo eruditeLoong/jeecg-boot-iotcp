@@ -50,6 +50,18 @@ public class DeviceInstanceTree extends TreeNode<DeviceInstanceTree> implements 
     @ApiModelProperty(value = "实例名称")
     private String name;
     /**
+     * 场景
+     */
+    @Excel(name = "场景", width = 15)
+    @ApiModelProperty(value = "场景")
+    private String sceneBy;
+    /**
+     * 场景方案
+     */
+    @Excel(name = "场景方案", width = 15)
+    @ApiModelProperty(value = "场景方案")
+    private String sceneSchemeBy;
+    /**
      * 设备模型
      */
     @Excel(name = "设备模型", width = 15, dictTable = "iot_device_model", dicText = "name", dicCode = "id")
@@ -62,7 +74,7 @@ public class DeviceInstanceTree extends TreeNode<DeviceInstanceTree> implements 
     @Excel(name = "所属机构", width = 15, dictTable = "iot_org", dicText = "name", dicCode = "id")
     @Dict(dictTable = "sys_depart", dicText = "depart_name", dicCode = "id")
     @ApiModelProperty(value = "所属机构")
-    private String orgBy;
+    private String sysOrgCode;
     /**
      * 设备实例状态
      */
@@ -118,15 +130,19 @@ public class DeviceInstanceTree extends TreeNode<DeviceInstanceTree> implements 
     @Excel(name = "设备类型", width = 15)
     private String deviceTypeText;
 
+    private String funcExecConf;
+
     public DeviceInstanceTree(DeviceInstance deviceInstance) {
         this.key = deviceInstance.getId();
         this.id = deviceInstance.getId();
         this.parentBy = deviceInstance.getParentBy();
         this.code = deviceInstance.getCode();
         this.name = deviceInstance.getName();
+        this.sceneBy = deviceInstance.getSceneBy();
+        this.sceneSchemeBy = deviceInstance.getSceneSchemeBy();
         this.title = deviceInstance.getName();
         this.modelBy = deviceInstance.getModelBy();
-        this.orgBy = deviceInstance.getOrgBy();
+        this.sysOrgCode = deviceInstance.getSysOrgCode();
         this.status = deviceInstance.getStatus();
         this.extendParams = deviceInstance.getExtendParams();
         this.createBy = deviceInstance.getCreateBy();
