@@ -1,0 +1,21 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "CodeLens (Launch) - JeecgApplication",
+            "request": "launch",
+            "mainClass": "org.jeecg.JeecgApplication",
+            "projectName": "jeecg-boot-module-system"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-JwtUtil<jeecg-boot-base-common>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "mainClass": "org.jeecg.common.system.util.JwtUtil",
+            "projectName": "jeecg-boot-base-common",
+            "args": ""
+        }
+    ]
+}

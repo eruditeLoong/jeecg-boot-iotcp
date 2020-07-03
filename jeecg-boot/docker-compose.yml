@@ -1,0 +1,84 @@
+version: '2'
+services:
+  redis:
+    image: redis
+    container_name: jeecg-boot-redis
+#    ports:
+#      - "6379:6379"
+#    volumes:
+#      - /data
+    command: redis-server --appendonly yes
+    environment:
+      - TZ=Asia/Shanghai
+  mysql:
+    image: mysql:5.7
+    container_name: jeecg-boot-mysql
+    ports:
+      - "3366:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      TZ: Asia/Shanghai
+    volumes:
+      - $PWD/../docker/mysql/conf:/etc/mysql
+      - $PWD/../docker/mysql/data:/var/lib/mysql
+    command: [
+      '--lower_case_table_names=1'
+    ]
+  elasticsearch:
+    image: elasticsearch
+    container_name: jeecg-boot-elasticsearch
+    environment:
+      ES_JAVA_OPTS: -Djava.net.preferIPv4Stack=true -Xms1g -Xmx1g
+      transport.host: 0.0.0.0
+      discovery.type: single-node
+      bootstrap.memory_lock: "true"
+      discovery.zen.minimum_master_nodes: 1
+      discovery.zen.ping.unicast.hosts: elasticsearch
+#    volumes:
+#      - elasticsearch-volume:/usr/share/elasticsearch/data
+#      ports:
+#        - "9200:9200"
+#        - "9300:9300"
+  kibana:
+    image: kibana
+    container_name: jeecg-boot-kibana
+    ports:
+      - "5602:5601"
+    environment:
+      ELASTICSEARCH_URL: http://elasticsearch:9200
+    links:
+      - elasticsearch:elasticsearch
+    depends_on:
+      - elasticsearch
+  jeecg-boot:
+    image: jeecg-boot
+    container_name: jeecg-boot
+    volumes:
+      - "/Users/zhouwenrong/IdeaProjects/upload/jeecg-boot:/upload"
+    environment:
+      - "spring.datasource.dynamic.datasource.master.url=jdbc:mysql://mysqldb:3306/jeecg-boot?characterEncoding=UTF-8&useUnicode=true&useSSL=false&tinyInt1isBit=false"
+      - "spring.datasource.dynamic.datasource.master.username=root"
+      - "spring.datasource.dynamic.datasource.master.password=root"
+      - "spring.redis.host=redis"
+      - "spring.redis.port=6379"
+    links:
+      - redis:redis
+      - mysql:mysqldb
+    depends_on:
+      - redis
+      - mysql
+    ports:
+      - 8080:8080
+    restart: always
+  nginx:
+    restart: always
+    image: nginx:1.17.9-alpine
+    container_name: jeecg-boot-ui
+    ports:
+      - 80:80
+    volumes:
+      - $PWD/../docker/nginx/conf:/etc/nginx/conf.d
+      - $PWD/../docker/nginx/log:/var/log/nginx
+      - $PWD/../docker/nginx/www:/var/www
+    environment:
+      - TZ=Asia/Shanghai

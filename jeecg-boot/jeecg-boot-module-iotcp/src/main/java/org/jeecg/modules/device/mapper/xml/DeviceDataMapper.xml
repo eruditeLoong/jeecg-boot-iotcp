@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.device.mapper.DeviceDataMapper">
+
+	<delete id="deleteByMainId" parameterType="java.lang.String">
+		DELETE 
+		FROM  iot_device_data
+		WHERE
+			 device_model_by = #{mainId} 	</delete>
+
+	<select id="selectByMainId" parameterType="java.lang.String" resultType="org.jeecg.modules.device.entity.DeviceData">
+		SELECT * 
+		FROM  iot_device_data
+		WHERE
+			 device_model_by = #{mainId} 	</select>
+
+	<!-- 根据设备实例id，获取设备的数据节点 -->
+	<select id="listDeviceDataByInstanceId" parameterType="java.lang.String" resultType="org.jeecg.modules.device.entity.DeviceData">
+		SELECT
+			d.*
+		FROM
+			iot_device_data d,
+			iot_device_model m,
+			iot_device_instance i
+		WHERE
+			1 = 1
+			AND i.id = #{deviceInstanceId}
+			AND i.model_by = m.id
+			AND d.device_model_by = m.id
+	</select>
+</mapper>

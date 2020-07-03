@@ -1,0 +1,5 @@
+[
+    {
+        "dataId":"1255500411378737154",
+        "inputMode":"1",
+        "deviceData":{"code":"tcpServerAddr","valueType":{"type":"address"}, "name":"服务地址","id":"1255500411378737154","deviceModelBy":"1252585944936529921","rwAuthor":"w","value":"192.168.1.100:8888"}},{"dataId":"1255500680221040642","inputMode":"1","deviceData":{"code":"tcpLocalAddr","valueType":"{"type":"address"}","name":"本地地址","id":"1255500680221040642","deviceModelBy":"1252585944936529921","rwAuthor":"w","value":"192.168.1.200:23"}}]
