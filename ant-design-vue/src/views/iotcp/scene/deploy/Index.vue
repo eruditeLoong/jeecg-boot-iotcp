@@ -85,7 +85,6 @@
                 }
             },
             init: function () {
-                let self = this
                 this.container = document.getElementById('container')
 
                 this.initRender()
@@ -367,7 +366,6 @@
                 this.camera.updateProjectionMatrix()
             },
             windowInit () {
-                let self = this
                 setTimeout(() => {
                     this.$message.success('窗口初始化完成')
                     if (document.createEvent) {
@@ -463,8 +461,6 @@
                     padding-bottom: 20px;
                 }
 
-                .progress {
-                }
             }
         }
     }
