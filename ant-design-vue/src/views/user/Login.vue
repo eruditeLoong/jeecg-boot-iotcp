@@ -8,6 +8,7 @@
                 <a-tab-pane key="tab1" tab="账号密码登陆">
                     <a-form-item>
                         <a-input
+                            autocomplete='off'
                             placeholder="请输入帐户名 / admin"
                             size="large"
                             type="text"
@@ -18,7 +19,7 @@
 
                     <a-form-item>
                         <a-input
-                            autocomplete="false"
+                            autocomplete="off"
                             placeholder="密码 / 123456"
                             size="large"
                             type="password"
@@ -31,6 +32,7 @@
                         <a-col :span="16">
                             <a-form-item>
                                 <a-input
+                                    autocomplete='off'
                                     @change="inputCodeChange"
                                     placeholder="请输入验证码"
                                     size="large"

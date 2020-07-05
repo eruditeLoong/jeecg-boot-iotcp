@@ -13,25 +13,25 @@
                 <a-row>
                     <a-col :sm="8" :xs="8">
                         <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="名称">
-                            <a-input placeholder="请输入名称" v-decorator="['name', validatorRules.name]"></a-input>
+                            <a-input autocomplete='off' placeholder="请输入名称" v-decorator="['name', validatorRules.name]"></a-input>
                         </a-form-item>
                         <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="标识">
-                            <a-input placeholder="请输入标识" v-decorator="['code', validatorRules.code]"></a-input>
+                            <a-input autocomplete='off' placeholder="请输入标识" v-decorator="['code', validatorRules.code]"></a-input>
                         </a-form-item>
                         <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="3D模型文件">
                             <j-upload :trigger-change="true" v-decorator="['modelFiles', validatorRules.modelFiles]"></j-upload>
                         </a-form-item>
                         <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="模型比例">
-                            <a-input placeholder="请输入模型比例" v-decorator="['modelScale', validatorRules.modelScale]"></a-input>
+                            <a-input autocomplete='off' placeholder="请输入模型比例" v-decorator="['modelScale', validatorRules.modelScale]"></a-input>
                         </a-form-item>
                         <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="软件缩放">
-                            <a-input placeholder="请输入软件缩放" v-decorator="['softwareZoom', validatorRules.softwareZoom]"></a-input>
+                            <a-input autocomplete='off' placeholder="请输入软件缩放" v-decorator="['softwareZoom', validatorRules.softwareZoom]"></a-input>
                         </a-form-item>
                         <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="地理位置">
-                            <a-input placeholder="请输入地理位置" v-decorator="['address', validatorRules.address]"></a-input>
+                            <a-input autocomplete='off' placeholder="请输入地理位置" v-decorator="['address', validatorRules.address]"></a-input>
                         </a-form-item>
                         <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="经纬度">
-                            <a-input placeholder="请输入经纬度" v-decorator="['latLon', validatorRules.latLon]"></a-input>
+                            <a-input autocomplete='off' placeholder="请输入经纬度" v-decorator="['latLon', validatorRules.latLon]"></a-input>
                         </a-form-item>
                         <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="所属机构">
                             <j-select-depart
