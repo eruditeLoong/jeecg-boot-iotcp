@@ -3,6 +3,9 @@
     <!--定义日志文件的存储地址 -->
     <property name="LOG_HOME" value="../logs"/>
 
+    <include resource="org/springframework/boot/logging/logback/base.xml" />
+    <contextName>logback</contextName>
+
     <!--<property name="COLOR_PATTERN" value="%black(%contextName-) %red(%d{yyyy-MM-dd HH:mm:ss}) %green([%thread]) %highlight(%-5level) %boldMagenta( %replace(%caller{1}){'\t|Caller.{1}0|\r\n', ''})- %gray(%msg%xEx%n)" />-->
     <!-- 控制台输出 -->
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
@@ -59,6 +62,15 @@
     </appender>
 	<!-- 每天生成一个html格式的日志结束 -->
 
+    <appender name="STASH" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+        <destination>localhost:5044</destination>
+        <!-- encoder必须配置,有多种可选 -->
+        <encoder charset="UTF-8" class="net.logstash.logback.encoder.LogstashEncoder">
+            <!-- "appname":"xxx" 的作用是指定创建索引的名字时用，并且在生成的文档中会多了这个字段  -->
+            <customFields>{"appname":"iotcp"}</customFields>
+        </encoder>
+    </appender>
+
 	<!--myibatis log configure -->
 	<logger name="com.apache.ibatis" level="TRACE" />
 	<logger name="java.sql.Connection" level="DEBUG" />
@@ -67,10 +79,11 @@
 
 	<!-- 日志输出级别 -->
 	<root level="INFO">
-		<appender-ref ref="STDOUT" />
+<!--		<appender-ref ref="STDOUT" />-->
 		<appender-ref ref="FILE" />
 		<appender-ref ref="HTML" />
 		<appender-ref ref="FILE_HTML" />
-	</root>
+        <appender-ref ref="STASH" />
+    </root>
 
 </configuration>
