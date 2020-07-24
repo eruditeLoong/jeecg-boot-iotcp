@@ -1,4 +1,4 @@
-version: '2'
+version: '3'
 services:
   redis:
     image: redis
@@ -19,8 +19,8 @@ services:
       MYSQL_ROOT_PASSWORD: root
       TZ: Asia/Shanghai
     volumes:
-      - $PWD/../docker/mysql/conf:/etc/mysql
-      - $PWD/../docker/mysql/data:/var/lib/mysql
+      - /Users/zhouwenrong/docker/mysql/conf:/etc/mysql
+      - /Users/zhouwenrong/docker/mysql/data:/var/lib/mysql
     command: [
       '--lower_case_table_names=1'
     ]
@@ -34,22 +34,38 @@ services:
       bootstrap.memory_lock: "true"
       discovery.zen.minimum_master_nodes: 1
       discovery.zen.ping.unicast.hosts: elasticsearch
-#    volumes:
-#      - elasticsearch-volume:/usr/share/elasticsearch/data
-#      ports:
-#        - "9200:9200"
-#        - "9300:9300"
+    volumes:
+      - /Users/zhouwenrong/docker/elk/elasticsearch/plugins:/usr/share/elasticsearch/plugins #插件文件挂载
+      - /Users/zhouwenrong/docker/elk/elasticsearch/data:/usr/share/elasticsearch/data #数据文件挂载
+    ports:
+      - "9200:9200"
+      - "9300:9300"
   kibana:
     image: kibana
     container_name: jeecg-boot-kibana
-    ports:
-      - "5602:5601"
-    environment:
-      ELASTICSEARCH_URL: http://elasticsearch:9200
     links:
       - elasticsearch:elasticsearch
+    ports:
+      - "5601:5601"
+    environment:
+      ELASTICSEARCH_URL: http://elasticsearch:9200 #设置访问elasticsearch的地址
     depends_on:
       - elasticsearch
+  logstash:
+    image: logstash
+    container_name: jeecg-boot-logstash
+    command: logstash -f /etc/logstash/conf.d/logstash.conf  #logstash 启动时使用的配置文件
+    volumes:
+      - /Users/zhouwenrong/docker/elk/logstash/conf.d:/etc/logstash/conf.d #挂载logstash的配置文件
+    depends_on:
+      - elasticsearch #kibana在elasticsearch启动之后再启动
+    links:
+      - elasticsearch:elasticsearch #可以用es这个域名访问elasticsearch服务
+    ports:
+      - 4560:4560
+      - 5044:5044
+      - 9600:9600
+
   jeecg-boot:
     image: jeecg-boot
     container_name: jeecg-boot
@@ -71,14 +87,14 @@ services:
       - 8080:8080
     restart: always
   nginx:
-    restart: always
-    image: nginx:1.17.9-alpine
+#    restart: always
+    image: nginx
     container_name: jeecg-boot-ui
     ports:
       - 80:80
     volumes:
-      - $PWD/../docker/nginx/conf:/etc/nginx/conf.d
-      - $PWD/../docker/nginx/log:/var/log/nginx
-      - $PWD/../docker/nginx/www:/var/www
+      - /Users/zhouwenrong/docker/nginx/conf:/etc/nginx/conf.d
+      - /Users/zhouwenrong/docker/nginx/log:/var/log/nginx
+      - /Users/zhouwenrong/docker/nginx/www:/var/www
     environment:
       - TZ=Asia/Shanghai
