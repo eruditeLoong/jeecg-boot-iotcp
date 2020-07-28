@@ -21,7 +21,10 @@ public class MinioUtil {
     private static String minioName;
     private static String minioPass;
     private static String bucketName;
-    private static MinioClient minioClient = null;
+
+    public static void setMinioUrl(String minioUrl) {
+        MinioUtil.minioUrl = minioUrl;
+    }
 
     public static void setMinioName(String minioName) {
         MinioUtil.minioName = minioName;
@@ -31,38 +34,35 @@ public class MinioUtil {
         MinioUtil.minioPass = minioPass;
     }
 
-    public static String getMinioUrl() {
-        return minioUrl;
+    public static void setBucketName(String bucketName) {
+        MinioUtil.bucketName = bucketName;
     }
 
-    public static void setMinioUrl(String minioUrl) {
-        MinioUtil.minioUrl = minioUrl;
+    public static String getMinioUrl() {
+        return minioUrl;
     }
 
     public static String getBucketName() {
         return bucketName;
     }
 
-    public static void setBucketName(String bucketName) {
-        MinioUtil.bucketName = bucketName;
-    }
+    private static MinioClient minioClient = null;
 
     /**
      * 上传文件
-     *
      * @param file
      * @return
      */
     public static String upload(MultipartFile file, String bizPath, String customBucket) {
         String file_url = "";
         String newBucket = bucketName;
-        if (oConvertUtils.isNotEmpty(customBucket)) {
+        if(oConvertUtils.isNotEmpty(customBucket)){
             newBucket = customBucket;
         }
         try {
-            initMinio(minioUrl, minioName, minioPass);
+            initMinio(minioUrl, minioName,minioPass);
             // 检查存储桶是否已经存在
-            if (minioClient.bucketExists(newBucket)) {
+            if(minioClient.bucketExists(newBucket)) {
                 log.info("Bucket already exists.");
             } else {
                 // 创建一个名为ota的存储桶
@@ -72,14 +72,17 @@ public class MinioUtil {
             InputStream stream = file.getInputStream();
             // 获取文件名
             String orgName = file.getOriginalFilename();
+            if("".equals(orgName)){
+                orgName=file.getName();
+            }
             orgName = CommonUtils.getFileName(orgName);
-            String objectName = bizPath + "/" + orgName.substring(0, orgName.lastIndexOf(".")) + "_" + System.currentTimeMillis() + orgName.substring(orgName.indexOf("."));
+            String objectName = bizPath+"/"+orgName.substring(0, orgName.lastIndexOf(".")) + "_" + System.currentTimeMillis() + orgName.substring(orgName.indexOf("."));
 
             // 使用putObject上传一个本地文件到存储桶中。
-            minioClient.putObject(newBucket, objectName, stream, stream.available(), "application/octet-stream");
+            minioClient.putObject(newBucket,objectName, stream,stream.available(),"application/octet-stream");
             stream.close();
-            file_url = minioUrl + newBucket + "/" + objectName;
-        } catch (IOException e) {
+            file_url = minioUrl+newBucket+"/"+objectName;
+        }catch (IOException e){
             log.error(e.getMessage(), e);
         } catch (InvalidKeyException e) {
             log.error(e.getMessage(), e);
@@ -107,23 +110,21 @@ public class MinioUtil {
 
     /**
      * 文件上传
-     *
      * @param file
      * @param bizPath
      * @return
      */
     public static String upload(MultipartFile file, String bizPath) {
-        return upload(file, bizPath, null);
+        return  upload(file,bizPath,null);
     }
 
     /**
      * 获取文件流
-     *
      * @param bucketName
      * @param objectName
      * @return
      */
-    public static InputStream getMinioFile(String bucketName, String objectName) {
+    public static InputStream getMinioFile(String bucketName,String objectName){
         InputStream inputStream = null;
         try {
             initMinio(minioUrl, minioName, minioPass);
@@ -136,34 +137,32 @@ public class MinioUtil {
 
     /**
      * 删除文件
-     *
      * @param bucketName
      * @param objectName
      * @throws Exception
      */
     public static void removeObject(String bucketName, String objectName) {
         try {
-            initMinio(minioUrl, minioName, minioPass);
+            initMinio(minioUrl, minioName,minioPass);
             minioClient.removeObject(bucketName, objectName);
-        } catch (Exception e) {
+        }catch (Exception e){
             log.info("文件删除失败" + e.getMessage());
         }
     }
 
     /**
      * 获取文件外链
-     *
      * @param bucketName
      * @param objectName
      * @param expires
      * @return
      */
     public static String getObjectURL(String bucketName, String objectName, Integer expires) {
-        initMinio(minioUrl, minioName, minioPass);
-        try {
+        initMinio(minioUrl, minioName,minioPass);
+        try{
             String url = minioClient.presignedGetObject(bucketName, objectName, expires);
-            return URLDecoder.decode(url, "UTF-8");
-        } catch (Exception e) {
+            return URLDecoder.decode(url,"UTF-8");
+        }catch (Exception e){
             log.info("文件路径获取失败" + e.getMessage());
         }
         return null;
@@ -171,16 +170,15 @@ public class MinioUtil {
 
     /**
      * 初始化客户端
-     *
      * @param minioUrl
      * @param minioName
      * @param minioPass
      * @return
      */
-    private static MinioClient initMinio(String minioUrl, String minioName, String minioPass) {
+    private static MinioClient initMinio(String minioUrl, String minioName,String minioPass) {
         if (minioClient == null) {
             try {
-                minioClient = new MinioClient(minioUrl, minioName, minioPass);
+                minioClient = new MinioClient(minioUrl, minioName,minioPass);
             } catch (InvalidEndpointException e) {
                 e.printStackTrace();
             } catch (InvalidPortException e) {
@@ -192,23 +190,22 @@ public class MinioUtil {
 
     /**
      * 上传文件到minio
-     *
      * @param stream
      * @param relativePath
      * @return
      */
-    public static String upload(InputStream stream, String relativePath) throws IOException, InvalidKeyException, NoSuchAlgorithmException, InsufficientDataException, InternalException, NoResponseException, InvalidBucketNameException, XmlPullParserException, ErrorResponseException, RegionConflictException, InvalidArgumentException {
-        initMinio(minioUrl, minioName, minioPass);
-        if (minioClient.bucketExists(bucketName)) {
+    public static String upload(InputStream stream,String relativePath) throws IOException, InvalidKeyException, NoSuchAlgorithmException, InsufficientDataException, InternalException, NoResponseException, InvalidBucketNameException, XmlPullParserException, ErrorResponseException, RegionConflictException, InvalidArgumentException {
+        initMinio(minioUrl, minioName,minioPass);
+        if(minioClient.bucketExists(bucketName)) {
             log.info("Bucket already exists.");
         } else {
             // 创建一个名为ota的存储桶
             minioClient.makeBucket(bucketName);
             log.info("create a new bucket.");
         }
-        minioClient.putObject(bucketName, relativePath, stream, stream.available(), "application/octet-stream");
+        minioClient.putObject(bucketName,relativePath, stream, stream.available(),"application/octet-stream");
         stream.close();
-        return minioUrl + bucketName + "/" + relativePath;
+        return minioUrl+bucketName+"/"+relativePath;
     }
 
 }

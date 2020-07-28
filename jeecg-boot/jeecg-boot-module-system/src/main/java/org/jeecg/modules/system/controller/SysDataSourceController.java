@@ -135,7 +135,7 @@ public class SysDataSourceController extends JeecgController<SysDataSource, ISys
     @DeleteMapping(value = "/deleteBatch")
     public Result<?> deleteBatch(@RequestParam(name = "ids") String ids) {
         List<String> idList = Arrays.asList(ids.split(","));
-        idList.forEach(item -> {
+        idList.forEach(item->{
             SysDataSource sysDataSource = sysDataSourceService.getById(item);
             DataSourceCachePool.removeCache(sysDataSource.getCode());
         });

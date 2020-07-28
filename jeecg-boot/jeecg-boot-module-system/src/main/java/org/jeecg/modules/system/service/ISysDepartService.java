@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import org.jeecg.modules.system.entity.SysDepart;
 import org.jeecg.modules.system.model.DepartIdModel;
 import org.jeecg.modules.system.model.SysDepartTreeModel;
-
 import java.util.List;
 
 /**
@@ -54,14 +53,13 @@ public interface ISysDepartService extends IService<SysDepart>{
      * @return
      */
 	/* boolean removeDepartDataById(String id); */
-
+    
     /**
      * 根据关键字搜索相关的部门数据
-     *
      * @param keyWord
      * @return
      */
-    List<SysDepartTreeModel> searhBy(String keyWord, String myDeptSearch, String departIds);
+    List<SysDepartTreeModel> searhBy(String keyWord,String myDeptSearch,String departIds);
     
     /**
      * 根据部门id删除并删除其可能存在的子级部门
@@ -104,5 +102,9 @@ public interface ISysDepartService extends IService<SysDepart>{
      * @return
      */
     List<String> getMySubDepIdsByDepId(String departIds);
-    
+    /**
+     * 根据关键字获取部门信息（通讯录）
+     * @return
+     */
+    List<SysDepartTreeModel> queryTreeByKeyWord(String keyWord);
 }

@@ -3,26 +3,27 @@ import router from './router'
 import store from './store'
 import NProgress from 'nprogress' // progress bar
 import 'nprogress/nprogress.css' // progress bar style
-import {ACCESS_TOKEN, INDEX_MAIN_PAGE_PATH} from '@/store/mutation-types'
-import {generateIndexRouter} from "@/utils/util"
+import notification from 'ant-design-vue/es/notification'
+import { ACCESS_TOKEN,INDEX_MAIN_PAGE_PATH } from '@/store/mutation-types'
+import { generateIndexRouter } from "@/utils/util"
 
-NProgress.configure({showSpinner: false}) // NProgress Configuration
+NProgress.configure({ showSpinner: false }) // NProgress Configuration
 
-const whiteList = ['/user/login', '/user/register', '/user/register-result', '/user/alteration', '/public/static/'] // no redirect whitelist
+const whiteList = ['/user/login', '/user/register', '/user/register-result','/user/alteration'] // no redirect whitelist
 
 router.beforeEach((to, from, next) => {
-    NProgress.start() // start progress bar
+  NProgress.start() // start progress bar
 
-    if (Vue.ls.get(ACCESS_TOKEN)) {
-        /* has token */
-        if (to.path === '/user/login') {
-            next({path: INDEX_MAIN_PAGE_PATH})
-            NProgress.done()
-        } else {
+  if (Vue.ls.get(ACCESS_TOKEN)) {
+    /* has token */
+    if (to.path === '/user/login') {
+      next({ path: INDEX_MAIN_PAGE_PATH })
+      NProgress.done()
+    } else {
       if (store.getters.permissionList.length === 0) {
         store.dispatch('GetPermissionList').then(res => {
               const menuData = res.result.menu;
-              console.log(res.message)
+              //console.log(res.message)
               if (menuData === null || menuData === "" || menuData === undefined) {
                 return;
               }

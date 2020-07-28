@@ -29,16 +29,18 @@ import java.util.List;
 @Slf4j
 public class OnlineInterceptor implements HandlerInterceptor {
 
+    @Autowired
+    private ISysPermissionService sysPermissionService;
+
     /**
      * online表单菜单地址
      */
     private static final String ONLINE_FORM = "/online/cgform";
+
     /**
      * online功能测试地址 前缀
      */
     private static final String[] ONLINE_TEST_PRE = {"/online/cgformErpList", "/online/cgformList", "/online/cgformTreeList"};
-    @Autowired
-    private ISysPermissionService sysPermissionService;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {

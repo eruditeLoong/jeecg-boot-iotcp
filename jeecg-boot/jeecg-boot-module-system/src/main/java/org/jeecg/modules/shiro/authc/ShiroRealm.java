@@ -1,6 +1,7 @@
 package org.jeecg.modules.shiro.authc;
 
-import lombok.extern.slf4j.Slf4j;
+import java.util.Set;
+
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -16,12 +17,14 @@ import org.jeecg.common.system.vo.LoginUser;
 import org.jeecg.common.util.RedisUtil;
 import org.jeecg.common.util.SpringContextUtils;
 import org.jeecg.common.util.oConvertUtils;
+import org.jeecg.modules.system.entity.SysUser;
 import org.jeecg.modules.system.service.ISysUserService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
-import java.util.Set;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @Description: 用户登录鉴权和获取用户授权
@@ -112,15 +115,15 @@ public class ShiroRealm extends AuthorizingRealm {
 		}
 
 		// 查询用户信息
-		log.debug("———校验token是否有效————checkUserTokenIsEffect——————— " + token);
-		LoginUser loginUser = sysBaseAPI.getUserByName(username);
+		log.debug("———校验token是否有效————checkUserTokenIsEffect——————— "+ token);
+        LoginUser loginUser = sysBaseAPI.getUserByName(username);
 		if (loginUser == null) {
 			throw new AuthenticationException("用户不存在!");
 		}
-		// 判断用户状态
-		if (loginUser.getStatus() != 1) {
-			throw new AuthenticationException("账号已被锁定,请联系管理员!");
-		}
+        // 判断用户状态
+        if (loginUser.getStatus() != 1) {
+            throw new AuthenticationException("账号已被锁定,请联系管理员!");
+        }
 		// 校验token是否超时失效 & 或者账号密码是否错误
 		if (!jwtTokenRefresh(token, username, loginUser.getPassword())) {
 			throw new AuthenticationException("Token失效，请重新登录!");

@@ -28,50 +28,35 @@ import java.util.regex.Pattern;
 
 @Slf4j
 public class QueryGenerator {
-    public static final String SQL_RULES_COLUMN = "SQL_RULES_COLUMN";
+	public static final String SQL_RULES_COLUMN = "SQL_RULES_COLUMN";
 
-    private static final String BEGIN = "_begin";
-    private static final String END = "_end";
-    /**
-     * 单引号
-     */
-    public static final String SQL_SQ = "'";
-    private static final String STAR = "*";
-    private static final String COMMA = ",";
-    private static final String NOT_EQUAL = "!";
-    /**
-     * 页面带有规则值查询，空格作为分隔符
-     */
-    private static final String QUERY_SEPARATE_KEYWORD = " ";
-    /**
-     * 高级查询前端传来的参数名
-     */
-    private static final String SUPER_QUERY_PARAMS = "superQueryParams";
-    /**
-     * 数字类型字段，拼接此后缀 接受多值参数
-     */
-    private static final String MULTI = "_MultiString";
-    /**
-     * 高级查询前端传来的拼接方式参数名
-     */
-    private static final String SUPER_QUERY_MATCH_TYPE = "superQueryMatchType";
-    /**
-     * 排序列
-     */
-    private static final String ORDER_COLUMN = "column";
-    /**
-     * 排序方式
-     */
-    private static final String ORDER_TYPE = "order";
-    private static final String ORDER_TYPE_ASC = "ASC";
-
-    /**
-     * 时间格式化
-     */
-    private static final ThreadLocal<SimpleDateFormat> local = new ThreadLocal<SimpleDateFormat>();
-
-    private static SimpleDateFormat getTime() {
-        SimpleDateFormat time = local.get();
+	private static final String BEGIN = "_begin";
+	private static final String END = "_end";
+	/**
+	 * 数字类型字段，拼接此后缀 接受多值参数
+	 */
+	private static final String MULTI = "_MultiString";
+	private static final String STAR = "*";
+	private static final String COMMA = ",";
+	private static final String NOT_EQUAL = "!";
+	/**页面带有规则值查询，空格作为分隔符*/
+	private static final String QUERY_SEPARATE_KEYWORD = " ";
+	/**高级查询前端传来的参数名*/
+	private static final String SUPER_QUERY_PARAMS = "superQueryParams";
+	/** 高级查询前端传来的拼接方式参数名 */
+	private static final String SUPER_QUERY_MATCH_TYPE = "superQueryMatchType";
+	/** 单引号 */
+	public static final String SQL_SQ = "'";
+	/**排序列*/
+	private static final String ORDER_COLUMN = "column";
+	/**排序方式*/
+	private static final String ORDER_TYPE = "order";
+	private static final String ORDER_TYPE_ASC = "ASC";
+	
+	/**时间格式化 */
+	private static final ThreadLocal<SimpleDateFormat> local = new ThreadLocal<SimpleDateFormat>();
+	private static SimpleDateFormat getTime(){
+		SimpleDateFormat time = local.get();
 		if(time == null){
 			time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			local.set(time);
@@ -134,39 +119,39 @@ public class QueryGenerator {
 				//数据权限查询
 				if(ruleMap.containsKey(name)) {
 					addRuleToQueryWrapper(ruleMap.get(name), name, origDescriptors[i].getPropertyType(), queryWrapper);
-                }
+				}
+				
+				// 添加 判断是否有区间值
+				String endValue = null,beginValue = null;
+				if (parameterMap != null && parameterMap.containsKey(name + BEGIN)) {
+					beginValue = parameterMap.get(name + BEGIN)[0].trim();
+					addQueryByRule(queryWrapper, name, type, beginValue, QueryRuleEnum.GE);
+					
+				}
+				if (parameterMap != null && parameterMap.containsKey(name + END)) {
+					endValue = parameterMap.get(name + END)[0].trim();
+					addQueryByRule(queryWrapper, name, type, endValue, QueryRuleEnum.LE);
+				}
+				//多值查询
+				if (parameterMap != null && parameterMap.containsKey(name + MULTI)) {
+					endValue = parameterMap.get(name + MULTI)[0].trim();
+					addQueryByRule(queryWrapper, name.replace(MULTI,""), type, endValue, QueryRuleEnum.IN);
+				}
 
-                // 添加 判断是否有区间值
-                String endValue = null, beginValue = null;
-                if (parameterMap != null && parameterMap.containsKey(name + BEGIN)) {
-                    beginValue = parameterMap.get(name + BEGIN)[0].trim();
-                    addQueryByRule(queryWrapper, name, type, beginValue, QueryRuleEnum.GE);
-
-                }
-                if (parameterMap != null && parameterMap.containsKey(name + END)) {
-                    endValue = parameterMap.get(name + END)[0].trim();
-                    addQueryByRule(queryWrapper, name, type, endValue, QueryRuleEnum.LE);
-                }
-                //多值查询
-                if (parameterMap != null && parameterMap.containsKey(name + MULTI)) {
-                    endValue = parameterMap.get(name + MULTI)[0].trim();
-                    addQueryByRule(queryWrapper, name.replace(MULTI, ""), type, endValue, QueryRuleEnum.IN);
-                }
-
-                //判断单值  参数带不同标识字符串 走不同的查询
-                //TODO 这种前后带逗号的支持分割后模糊查询需要否 使多选字段的查询生效
-                Object value = PropertyUtils.getSimpleProperty(searchObj, name);
-                if (null != value && value.toString().startsWith(COMMA) && value.toString().endsWith(COMMA)) {
-                    String multiLikeval = value.toString().replace(",,", COMMA);
-                    String[] vals = multiLikeval.substring(1, multiLikeval.length()).split(COMMA);
-                    final String field = oConvertUtils.camelToUnderline(name);
+				//判断单值  参数带不同标识字符串 走不同的查询
+				//TODO 这种前后带逗号的支持分割后模糊查询需要否 使多选字段的查询生效
+				Object value = PropertyUtils.getSimpleProperty(searchObj, name);
+				if (null != value && value.toString().startsWith(COMMA) && value.toString().endsWith(COMMA)) {
+					String multiLikeval = value.toString().replace(",,", COMMA);
+					String[] vals = multiLikeval.substring(1, multiLikeval.length()).split(COMMA);
+					final String field = oConvertUtils.camelToUnderline(name);
 					if(vals.length>1) {
 						queryWrapper.and(j -> {
 							j = j.like(field,vals[0]);
 							for (int k=1;k<vals.length;k++) {
 								j = j.or().like(field,vals[k]);
 							}
-							return j;
+							//return j;
 						});
 					}else {
 						queryWrapper.and(j -> j.like(field,vals[0]));
@@ -227,10 +212,10 @@ public class QueryGenerator {
 	 * @param queryWrapper
 	 * @param parameterMap
 	 */
-    public static void doSuperQuery(QueryWrapper<?> queryWrapper, Map<String, String[]> parameterMap) {
-        if (parameterMap != null && parameterMap.containsKey(SUPER_QUERY_PARAMS)) {
-            String superQueryParams = parameterMap.get(SUPER_QUERY_PARAMS)[0];
-            String superQueryMatchType = parameterMap.get(SUPER_QUERY_MATCH_TYPE) != null ? parameterMap.get(SUPER_QUERY_MATCH_TYPE)[0] : MatchTypeEnum.AND.getValue();
+	public static void doSuperQuery(QueryWrapper<?> queryWrapper,Map<String, String[]> parameterMap) {
+		if(parameterMap!=null&& parameterMap.containsKey(SUPER_QUERY_PARAMS)){
+			String superQueryParams = parameterMap.get(SUPER_QUERY_PARAMS)[0];
+			String superQueryMatchType = parameterMap.get(SUPER_QUERY_MATCH_TYPE) != null ? parameterMap.get(SUPER_QUERY_MATCH_TYPE)[0] : MatchTypeEnum.AND.getValue();
             MatchTypeEnum matchType = MatchTypeEnum.getByValue(superQueryMatchType);
             // update-begin--Author:sunjianlei  Date:20200325 for：高级查询的条件要用括号括起来，防止和用户的其他条件冲突 -------
             try {
@@ -256,7 +241,7 @@ public class QueryGenerator {
                             }
                         }
                     }
-                    return andWrapper;
+                    //return andWrapper;
                 });
             } catch (UnsupportedEncodingException e) {
                 log.error("--高级查询参数转码失败：" + superQueryParams, e);
@@ -358,46 +343,46 @@ public class QueryGenerator {
 		}
 		return value;
 	}
+	
+	private static void addQueryByRule(QueryWrapper<?> queryWrapper,String name,String type,String value,QueryRuleEnum rule) throws ParseException {
+		if(oConvertUtils.isNotEmpty(value)) {
+			Object temp;
+			// 针对数字类型字段，多值查询
+			if(value.indexOf(COMMA)!=-1){
+				temp = value;
+				addEasyQuery(queryWrapper, name, rule, temp);
+				return;
+			}
 
-    private static void addQueryByRule(QueryWrapper<?> queryWrapper, String name, String type, String value, QueryRuleEnum rule) throws ParseException {
-        if (oConvertUtils.isNotEmpty(value)) {
-            Object temp;
-            // 针对数字类型字段，多值查询
-            if (value.indexOf(COMMA) != -1) {
-                temp = value;
-                addEasyQuery(queryWrapper, name, rule, temp);
-                return;
-            }
-
-            switch (type) {
-                case "class java.lang.Integer":
-                    temp = Integer.parseInt(value);
-                    break;
-                case "class java.math.BigDecimal":
-                    temp = new BigDecimal(value);
-                    break;
-                case "class java.lang.Short":
-                    temp =  Short.parseShort(value);
-                    break;
-                case "class java.lang.Long":
-                    temp =  Long.parseLong(value);
-                    break;
-                case "class java.lang.Float":
-                    temp =   Float.parseFloat(value);
-                    break;
-                case "class java.lang.Double":
-                    temp =  Double.parseDouble(value);
-                    break;
-                case "class java.util.Date":
-                    temp = getDateQueryByRule(value, rule);
-                    break;
-                default:
-                    temp = value;
-                    break;
-            }
-            addEasyQuery(queryWrapper, name, rule, temp);
-        }
-    }
+			switch (type) {
+			case "class java.lang.Integer":
+				temp =  Integer.parseInt(value);
+				break;
+			case "class java.math.BigDecimal":
+				temp =  new BigDecimal(value);
+				break;
+			case "class java.lang.Short":
+				temp =  Short.parseShort(value);
+				break;
+			case "class java.lang.Long":
+				temp =  Long.parseLong(value);
+				break;
+			case "class java.lang.Float":
+				temp =   Float.parseFloat(value);
+				break;
+			case "class java.lang.Double":
+				temp =  Double.parseDouble(value);
+				break;
+			case "class java.util.Date":
+				temp = getDateQueryByRule(value, rule);
+				break;
+			default:
+				temp = value;
+				break;
+			}
+			addEasyQuery(queryWrapper, name, rule, temp);
+		}
+	}
 	
 	/**
 	 * 获取日期类型的值
@@ -521,58 +506,58 @@ public class QueryGenerator {
 			Object[] objs = new Object[values.length];
 			for (int i = 0; i < values.length; i++) {
 				objs[i] = NumberUtils.parseNumber(values[i], propertyType);
-            }
-            addEasyQuery(queryWrapper, name, rule, objs);
-        } else {
-            if (propertyType.equals(String.class)) {
-                addEasyQuery(queryWrapper, name, rule, converRuleValue(dataRule.getRuleValue()));
-            } else if (propertyType.equals(Date.class)) {
-                String dateStr = converRuleValue(dataRule.getRuleValue());
-                if (dateStr.length() == 10) {
-                    addEasyQuery(queryWrapper, name, rule, DateUtils.str2Date(dateStr, DateUtils.date_sdf.get()));
-                } else {
-                    addEasyQuery(queryWrapper, name, rule, DateUtils.str2Date(dateStr, DateUtils.datetimeFormat.get()));
-                }
-            } else {
-                addEasyQuery(queryWrapper, name, rule, NumberUtils.parseNumber(dataRule.getRuleValue(), propertyType));
-            }
-        }
-    }
+			}
+			addEasyQuery(queryWrapper, name, rule, objs);
+		}else {
+			if (propertyType.equals(String.class)) {
+				addEasyQuery(queryWrapper, name, rule, converRuleValue(dataRule.getRuleValue()));
+			}else if (propertyType.equals(Date.class)) {
+				String dateStr =converRuleValue(dataRule.getRuleValue());
+				if(dateStr.length()==10){
+					addEasyQuery(queryWrapper, name, rule, DateUtils.str2Date(dateStr,DateUtils.date_sdf.get()));
+				}else{
+					addEasyQuery(queryWrapper, name, rule, DateUtils.str2Date(dateStr,DateUtils.datetimeFormat.get()));
+				}
+			}else {
+				addEasyQuery(queryWrapper, name, rule, NumberUtils.parseNumber(dataRule.getRuleValue(), propertyType));
+			}
+		}
+	}
+	
+	public static String converRuleValue(String ruleValue) {
+		String value = JwtUtil.getSessionData(ruleValue);
+		if(oConvertUtils.isEmpty(value)) {
+			value = JwtUtil.getUserSystemData(ruleValue,null);
+		}
+		return value!= null ? value : ruleValue;
+	}
 
-    public static String converRuleValue(String ruleValue) {
-        String value = JwtUtil.getSessionData(ruleValue);
-        if (oConvertUtils.isEmpty(value)) {
-            value = JwtUtil.getUserSystemData(ruleValue, null);
-        }
-        return value != null ? value : ruleValue;
-    }
-
-    /**
-     * @param ruleValue:
-     * @author: scott
-     * @Description: 去掉值前后单引号
-     * @date: 2020/3/19 21:26
-     * @Return: java.lang.String
-     */
-    public static String trimSingleQuote(String ruleValue) {
-        if (oConvertUtils.isEmpty(ruleValue)) {
-            return "";
-        }
-        if (ruleValue.startsWith(QueryGenerator.SQL_SQ)) {
-            ruleValue = ruleValue.substring(1);
-        }
-        if (ruleValue.endsWith(QueryGenerator.SQL_SQ)) {
-            ruleValue = ruleValue.substring(0, ruleValue.length() - 1);
-        }
-        return ruleValue;
-    }
-
-    public static String getSqlRuleValue(String sqlRule) {
-        try {
-            Set<String> varParams = getSqlRuleParams(sqlRule);
-            for (String var : varParams) {
-                String tempValue = converRuleValue(var);
-                sqlRule = sqlRule.replace("#{"+var+"}",tempValue);
+	/**
+	* @author: scott
+	* @Description: 去掉值前后单引号
+	* @date: 2020/3/19 21:26
+	* @param ruleValue: 
+	* @Return: java.lang.String
+	*/
+	public static String trimSingleQuote(String ruleValue) {
+		if (oConvertUtils.isEmpty(ruleValue)) {
+			return "";
+		}
+		if (ruleValue.startsWith(QueryGenerator.SQL_SQ)) {
+			ruleValue = ruleValue.substring(1);
+		}
+		if (ruleValue.endsWith(QueryGenerator.SQL_SQ)) {
+			ruleValue = ruleValue.substring(0, ruleValue.length() - 1);
+		}
+		return ruleValue;
+	}
+	
+	public static String getSqlRuleValue(String sqlRule){
+		try {
+			Set<String> varParams = getSqlRuleParams(sqlRule);
+			for(String var:varParams){
+				String tempValue = converRuleValue(var);
+				sqlRule = sqlRule.replace("#{"+var+"}",tempValue);
 			}
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
@@ -712,19 +697,19 @@ public class QueryGenerator {
 			}
 		}else if(str.endsWith("*")) {
 			if(DataBaseConstant.DB_TYPE_SQLSERVER.equals(getDbType())){
-				return "N'"+str.substring(0,str.length() - 1) + "%'";
-            } else {
-                return "'" + str.substring(0, str.length() - 1) + "%'";
-            }
-        } else {
-            if (str.indexOf("%") >= 0) {
-                if (DataBaseConstant.DB_TYPE_SQLSERVER.equals(getDbType())) {
-                    if (str.startsWith("'") && str.endsWith("'")) {
-                        return "N" + str;
-                    } else {
-                        return "N" + "'" + str + "'";
-                    }
-                } else{
+				return "N'"+str.substring(0,str.length()-1)+"%'";
+			}else{
+				return "'"+str.substring(0,str.length()-1)+"%'";
+			}
+		}else {
+			if(str.indexOf("%")>=0) {
+				if(DataBaseConstant.DB_TYPE_SQLSERVER.equals(getDbType())){
+					if(str.startsWith("'") && str.endsWith("'")){
+						return "N"+str;
+					}else{
+						return "N"+"'"+str+"'";
+					}
+				}else{
 					if(str.startsWith("'") && str.endsWith("'")){
 						return str;
 					}else{
@@ -790,77 +775,74 @@ public class QueryGenerator {
 	 * @param parameterMap
 	 * @return
 	 */
-    public static void installAuthMplus(QueryWrapper<?> queryWrapper, Class<?> clazz) {
-        //权限查询
-        Map<String,SysPermissionDataRuleModel> ruleMap = getRuleMap();
-        PropertyDescriptor origDescriptors[] = PropertyUtils.getPropertyDescriptors(clazz);
-        for (String c : ruleMap.keySet()) {
-            if(oConvertUtils.isNotEmpty(c) && c.startsWith(SQL_RULES_COLUMN)){
-                queryWrapper.and(i ->i.apply(getSqlRuleValue(ruleMap.get(c).getRuleValue())));
-            }
-        }
-        String name;
-        for (int i = 0; i < origDescriptors.length; i++) {
-            name = origDescriptors[i].getName();
-            if (judgedIsUselessField(name)) {
-                continue;
-            }
-            if (ruleMap.containsKey(name)) {
-                addRuleToQueryWrapper(ruleMap.get(name), name, origDescriptors[i].getPropertyType(), queryWrapper);
-            }
-        }
-    }
+	public static void installAuthMplus(QueryWrapper<?> queryWrapper,Class<?> clazz) {
+		//权限查询
+		Map<String,SysPermissionDataRuleModel> ruleMap = getRuleMap();
+		PropertyDescriptor origDescriptors[] = PropertyUtils.getPropertyDescriptors(clazz);
+		for (String c : ruleMap.keySet()) {
+			if(oConvertUtils.isNotEmpty(c) && c.startsWith(SQL_RULES_COLUMN)){
+				queryWrapper.and(i ->i.apply(getSqlRuleValue(ruleMap.get(c).getRuleValue())));
+			}
+		}
+		String name;
+		for (int i = 0; i < origDescriptors.length; i++) {
+			name = origDescriptors[i].getName();
+			if (judgedIsUselessField(name)) {
+				continue;
+			}
+			if(ruleMap.containsKey(name)) {
+				addRuleToQueryWrapper(ruleMap.get(name), name, origDescriptors[i].getPropertyType(), queryWrapper);
+			}
+		}
+	}
 
-    /**
-     * 转换sql中的系统变量
-     *
-     * @param sql
-     * @return
-     */
-    public static String convertSystemVariables(String sql) {
-        return getSqlRuleValue(sql);
-    }
+	/**
+	 * 转换sql中的系统变量
+	 * @param sql
+	 * @return
+	 */
+	public static String convertSystemVariables(String sql){
+		return getSqlRuleValue(sql);
+	}
 
-    /**
-     * 获取所有配置的权限 返回sql字符串 不受字段限制 配置什么就拿到什么
-     *
-     * @return
-     */
-    public static String getAllConfigAuth() {
-        StringBuffer sb = new StringBuffer();
-        //权限查询
-        Map<String, SysPermissionDataRuleModel> ruleMap = getRuleMap();
-        String sql_and = " and ";
-        for (String c : ruleMap.keySet()) {
-            SysPermissionDataRuleModel dataRule = ruleMap.get(c);
-            String ruleValue = dataRule.getRuleValue();
-            if (oConvertUtils.isEmpty(ruleValue)) {
-                continue;
-            }
-            if (oConvertUtils.isNotEmpty(c) && c.startsWith(SQL_RULES_COLUMN)) {
-                sb.append(sql_and + getSqlRuleValue(ruleValue));
-            } else {
-                boolean isString = false;
-                ruleValue = ruleValue.trim();
-                if (ruleValue.startsWith("'") && ruleValue.endsWith("'")) {
-                    isString = true;
-                    ruleValue = ruleValue.substring(1, ruleValue.length() - 1);
-                }
-                QueryRuleEnum rule = QueryRuleEnum.getByValue(dataRule.getRuleConditions());
-                String value = converRuleValue(ruleValue);
-                String filedSql = getSingleSqlByRule(rule, c, value, isString);
-                sb.append(sql_and + filedSql);
-            }
-        }
-        log.info("query auth sql is = " + sb.toString());
-        return sb.toString();
-    }
+	/**
+	 * 获取所有配置的权限 返回sql字符串 不受字段限制 配置什么就拿到什么
+	 * @return
+	 */
+	public static String getAllConfigAuth() {
+		StringBuffer sb = new StringBuffer();
+		//权限查询
+		Map<String,SysPermissionDataRuleModel> ruleMap = getRuleMap();
+		String sql_and = " and ";
+		for (String c : ruleMap.keySet()) {
+			SysPermissionDataRuleModel dataRule = ruleMap.get(c);
+			String ruleValue = dataRule.getRuleValue();
+			if(oConvertUtils.isEmpty(ruleValue)){
+				continue;
+			}
+			if(oConvertUtils.isNotEmpty(c) && c.startsWith(SQL_RULES_COLUMN)){
+				sb.append(sql_and+getSqlRuleValue(ruleValue));
+			}else{
+				boolean isString  = false;
+				ruleValue = ruleValue.trim();
+				if(ruleValue.startsWith("'") && ruleValue.endsWith("'")){
+					isString = true;
+					ruleValue = ruleValue.substring(1,ruleValue.length()-1);
+				}
+				QueryRuleEnum rule = QueryRuleEnum.getByValue(dataRule.getRuleConditions());
+				String value = converRuleValue(ruleValue);
+				String filedSql = getSingleSqlByRule(rule, c, value,isString);
+				sb.append(sql_and+filedSql);
+			}
+		}
+		log.info("query auth sql is = "+sb.toString());
+		return sb.toString();
+	}
 
 
-    /**
-     * 当前系统数据库类型
-     */
-    private static String DB_TYPE;
+
+	/** 当前系统数据库类型 */
+	private static String DB_TYPE;
 	/**
 	 * 获取系统数据库类型
 	 */

@@ -1,12 +1,12 @@
 package org.jeecg.modules.system.mapper;
 
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Param;
 import org.jeecg.modules.system.entity.SysUser;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.jeecg.modules.system.model.SysUserSysDepartModel;
 import org.jeecg.modules.system.vo.SysUserDepVo;
 
@@ -62,7 +62,7 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
 	/**
 	 * 根据用户名设置部门ID
 	 * @param username
-	 * @param departId
+	 * @param orgCode
 	 */
 	void updateUserDepart(@Param("username") String username,@Param("orgCode") String orgCode);
 	
@@ -130,16 +130,13 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
 	 */
 	int deleteLogicDeleted(@Param("userIds") String userIds);
 
+    /** 更新空字符串为null【此写法有sql注入风险，禁止随便用】 */
+    int updateNullByEmptyString(@Param("fieldName") String fieldName);
+    
 	/**
-	 * 更新空字符串为null【此写法有sql注入风险，禁止随便用】
-	 */
-	int updateNullByEmptyString(@Param("fieldName") String fieldName);
-
-	/**
-	 * 根据部门Ids,查询部门下用户信息
-	 *
+	 *  根据部门Ids,查询部门下用户信息
 	 * @param departIds
 	 * @return
 	 */
-	List<SysUser> queryByDepIds(@Param("departIds") List<String> departIds, @Param("username") String username);
+	List<SysUser> queryByDepIds(@Param("departIds")List<String> departIds,@Param("username") String username);
 }

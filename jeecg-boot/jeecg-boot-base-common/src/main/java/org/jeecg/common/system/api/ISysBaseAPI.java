@@ -1,19 +1,20 @@
 package org.jeecg.common.system.api;
 
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
+
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import org.jeecg.common.system.vo.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @Description: 底层共通业务API，提供其他独立模块调用
  * @Author: scott
- * @Date:2019-4-20
+ * @Date:2019-4-20 
  * @Version:V1.0
  */
 public interface ISysBaseAPI {
@@ -64,17 +65,16 @@ public interface ISysBaseAPI {
 	/**
 	 * 获取当前数据库类型
 	 * @return
-	 * @throws Exception
-     */
-    public String getDatabaseType() throws SQLException;
-
-    /**
-     * 获取数据字典
-     *
-     * @param code
-     * @return
-     */
-    public List<DictModel> queryDictItemsByCode(String code);
+	 * @throws Exception 
+	 */
+	public String getDatabaseType() throws SQLException;
+	
+	/**
+	  * 获取数据字典
+	 * @param code
+	 * @return
+	 */
+	public List<DictModel> queryDictItemsByCode(String code);
 
     /**
      * 根据字典key获取字典值
@@ -93,10 +93,9 @@ public interface ISysBaseAPI {
 
     /**
      * 查询所有分类字典
-     *
      * @return
      */
-    public List<SysCategoryModel> queryAllDSysCategory();
+	public List<SysCategoryModel> queryAllDSysCategory();
 
 	/**
 	  * 获取表数据字典
@@ -105,31 +104,28 @@ public interface ISysBaseAPI {
 	 * @param code
 	 * @return
 	 */
-	List<DictModel> queryTableDictItemsByCode(String table, String text, String code);
+    List<DictModel> queryTableDictItemsByCode(String table, String text, String code);
+    
+    /**
+   	 * 查询所有部门 作为字典信息 id -->value,departName -->text
+   	 * @return
+   	 */
+   	public List<DictModel> queryAllDepartBackDictModel();
 
-	/**
-	 * 查询所有部门 作为字典信息 id -->value,departName -->text
-	 *
-	 * @return
-	 */
-	public List<DictModel> queryAllDepartBackDictModel();
-
-	/**
-	 * 查询所有部门，拼接查询条件
-	 *
-	 * @return
-	 */
-	List<JSONObject> queryAllDepart(Wrapper wrapper);
+    /**
+   	 * 查询所有部门，拼接查询条件
+   	 * @return
+   	 */
+   	List<JSONObject> queryAllDepart(Wrapper wrapper);
 
 	/**
 	 * 发送系统消息
-	 *
-	 * @param fromUser   发送人(用户登录账户)
-	 * @param toUser     发送给(用户登录账户)
-	 * @param title      消息主题
-	 * @param msgContent 消息内容
+	 * @param fromUser 发送人(用户登录账户)
+	 * @param toUser  发送给(用户登录账户)
+	 * @param title  消息主题
+	 * @param msgContent  消息内容
 	 */
-	public void sendSysAnnouncement(String fromUser, String toUser, String title, String msgContent);
+	public void sendSysAnnouncement(String fromUser,String toUser,String title, String msgContent);
 
 	/**
 	 * 发送系统消息
@@ -203,7 +199,6 @@ public interface ISysBaseAPI {
 
 	/**
 	 * 查询指定table的 text code 获取字典，包含text和value
-	 *
 	 * @param table
 	 * @param text
 	 * @param code
@@ -215,29 +210,26 @@ public interface ISysBaseAPI {
 
 	/**
 	 * 获取所有有效用户
-	 *
 	 * @return
 	 */
 	public List<ComboModel> queryAllUser();
 
-	/**
-	 * 获取所有有效用户 带参
-	 * userIds 默认选中用户
-	 *
-	 * @return
-	 */
-	public JSONObject queryAllUser(String[] userIds, int pageNo, int pageSize);
+    /**
+     * 获取所有有效用户 带参
+     * userIds 默认选中用户
+     * @return
+     */
+    public JSONObject queryAllUser(String[] userIds, int pageNo, int pageSize);
 
-	/**
-	 * 获取所有有效用户 拼接查询条件
-	 *
-	 * @return
-	 */
-	List<JSONObject> queryAllUser(Wrapper wrapper);
+    /**
+     * 获取所有有效用户 拼接查询条件
+     *
+     * @return
+     */
+    List<JSONObject> queryAllUser(Wrapper wrapper);
 
 	/**
 	 * 获取所有角色
-	 *
 	 * @return
 	 */
 	public List<ComboModel> queryAllRole();
@@ -294,7 +286,6 @@ public interface ISysBaseAPI {
 
 	/**
 	 * 根据部门Id获取部门负责人
-	 *
 	 * @param deptId
 	 * @return
 	 */
@@ -302,38 +293,34 @@ public interface ISysBaseAPI {
 
 	/**
 	 * 文件上传
-	 *
-	 * @param file       文件
-	 * @param bizPath    自定义路径
+	 * @param file 文件
+	 * @param bizPath 自定义路径
 	 * @param uploadType 上传方式
 	 * @return
 	 */
-	public String upload(MultipartFile file, String bizPath, String uploadType);
+	public String upload(MultipartFile file,String bizPath,String uploadType);
 
 	/**
 	 * 文件上传 自定义桶
-	 *
 	 * @param file
 	 * @param bizPath
 	 * @param uploadType
 	 * @param customBucket
 	 * @return
 	 */
-	public String upload(MultipartFile file, String bizPath, String uploadType, String customBucket);
+	public String upload(MultipartFile file,String bizPath,String uploadType,String customBucket);
 
 	/**
 	 * 文档管理文件下载预览
-	 *
 	 * @param filePath
 	 * @param uploadpath
 	 * @param response
 	 */
-	public void viewAndDownload(String filePath, String uploadpath, String uploadType, HttpServletResponse response);
+	public void viewAndDownload(String filePath, String uploadpath, String uploadType,HttpServletResponse response);
 
 
 	/**
 	 * 给指定用户发消息
-	 *
 	 * @param userIds
 	 * @param cmd
 	 */
@@ -342,19 +329,16 @@ public interface ISysBaseAPI {
 	/**
 	 * 根据id获取所有参与用户
 	 * userIds
-	 *
 	 * @return
 	 */
 	public List<LoginUser> queryAllUserByIds(String[] userIds);
-
 	/**
 	 * 将会议签到信息推动到预览
 	 * userIds
-	 *
-	 * @param userId
 	 * @return
+	 * @param userId
 	 */
-	void meetingSignWebsocket(String userId);
+    void meetingSignWebsocket(String userId);
 	/**
 	 * 根据name获取所有参与用户
 	 * userNames

@@ -1,11 +1,12 @@
 <template>
-  <a-modal
+  <j-modal
     title="选择部门"
     :width="modalWidth"
     :visible="visible"
     :confirmLoading="confirmLoading"
     @ok="handleSubmit"
     @cancel="handleCancel"
+    switchFullscreen
     cancelText="关闭">
     <a-spin tip="Loading..." :spinning="false">
       <a-input-search style="margin-bottom: 1px" placeholder="请输入部门名称按回车进行搜索" @search="onSearch" />
@@ -31,7 +32,7 @@
       </a-tree>
 
     </a-spin>
-  </a-modal>
+  </j-modal>
 </template>
 
 <script>
@@ -79,7 +80,6 @@
       loadDepart(){
         queryDepartTreeList().then(res=>{
           if(res.success){
-            console.log("*********",res.result)
             let arr = [...res.result]
             this.reWriterWithSlot(arr)
             this.treeData = arr

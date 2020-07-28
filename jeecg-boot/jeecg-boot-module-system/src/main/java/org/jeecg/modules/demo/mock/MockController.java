@@ -1,13 +1,5 @@
 package org.jeecg.modules.demo.mock;
 
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.IOUtils;
-import org.jeecg.common.api.vo.Result;
-import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.swing.filechooser.FileSystemView;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,6 +7,20 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.swing.filechooser.FileSystemView;
+
+import org.apache.commons.io.IOUtils;
+import org.jeecg.common.api.vo.Result;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("/api")
@@ -188,7 +194,7 @@ public class MockController {
 			//json = FileUtils.re.readFileToString(jsonFile);
 			//换个写法，解决springboot读取jar包中文件的问题
 			InputStream stream = getClass().getClassLoader().getResourceAsStream(jsonSrc.replace("classpath:", ""));
-			json = IOUtils.toString(stream, "UTF-8");
+			json = IOUtils.toString(stream,"UTF-8");
 		} catch (IOException e) {
 			log.error(e.getMessage(),e);
 		}

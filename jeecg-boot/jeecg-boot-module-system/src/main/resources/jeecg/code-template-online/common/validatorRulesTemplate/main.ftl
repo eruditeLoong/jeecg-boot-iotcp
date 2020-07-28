@@ -1,5 +1,5 @@
-validatorRules: {
+        validatorRules: {
 <#list columns as po>
-    <#include "core.ftl">
+  <#include "core.ftl">
 </#list>
-},
+        },

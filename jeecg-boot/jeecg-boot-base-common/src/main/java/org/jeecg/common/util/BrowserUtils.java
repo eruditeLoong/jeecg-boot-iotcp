@@ -1,10 +1,11 @@
 package org.jeecg.common.util;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * 
@@ -179,30 +180,27 @@ public class BrowserUtils {
 	}
 	
 	public static String getBrowserLanguage(HttpServletRequest request) {
-
+		
 		String browserLang = request.getLocale().getLanguage();
-		String browserLangCode = (String) langMap.get(browserLang);
-
-		if (browserLangCode == null) {
+		String browserLangCode = (String)langMap.get(browserLang);
+		
+		if(browserLangCode == null)
+		{
 			browserLangCode = EN_US;
 		}
 		return browserLangCode;
 	}
 
-	/**
-	 * 判断请求是否来自电脑端
-	 */
-	public static boolean isDesktop(HttpServletRequest request) {
-		return !isMobile(request);
-	}
+    /** 判断请求是否来自电脑端 */
+    public static boolean isDesktop(HttpServletRequest request) {
+        return !isMobile(request);
+    }
 
-	/**
-	 * 判断请求是否来自移动端
-	 */
-	public static boolean isMobile(HttpServletRequest request) {
-		String ua = request.getHeader("User-Agent").toLowerCase();
-		Pattern pattern = Pattern.compile("(phone|pad|pod|iphone|ipod|ios|ipad|android|mobile|blackberry|iemobile|mqqbrowser|juc|fennec|wosbrowser|browserng|webos|symbian|windows phone)");
-		return pattern.matcher(ua).find();
-	}
+    /** 判断请求是否来自移动端 */
+    public static boolean isMobile(HttpServletRequest request) {
+        String ua = request.getHeader("User-Agent").toLowerCase();
+        Pattern pattern = Pattern.compile("(phone|pad|pod|iphone|ipod|ios|ipad|android|mobile|blackberry|iemobile|mqqbrowser|juc|fennec|wosbrowser|browserng|webos|symbian|windows phone)");
+        return pattern.matcher(ua).find();
+    }
 
 }

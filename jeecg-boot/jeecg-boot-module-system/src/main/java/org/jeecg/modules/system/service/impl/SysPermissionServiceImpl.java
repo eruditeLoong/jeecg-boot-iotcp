@@ -1,8 +1,12 @@
 package org.jeecg.modules.system.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
 import org.jeecg.common.constant.CacheConstant;
 import org.jeecg.common.constant.CommonConstant;
 import org.jeecg.common.exception.JeecgBootException;
@@ -21,11 +25,9 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 /**
  * <p>
@@ -40,7 +42,7 @@ public class SysPermissionServiceImpl extends ServiceImpl<SysPermissionMapper, S
 
 	@Resource
 	private SysPermissionMapper sysPermissionMapper;
-
+	
 	@Resource
 	private ISysPermissionDataRuleService permissionDataRuleService;
 
@@ -59,7 +61,7 @@ public class SysPermissionServiceImpl extends ServiceImpl<SysPermissionMapper, S
 	}
 
 	/**
-	 * 真实删除
+	  * 真实删除
 	 */
 	@Override
 	@Transactional
@@ -70,9 +72,9 @@ public class SysPermissionServiceImpl extends ServiceImpl<SysPermissionMapper, S
 			throw new JeecgBootException("未找到菜单信息");
 		}
 		String pid = sysPermission.getParentId();
-		if (oConvertUtils.isNotEmpty(pid)) {
+		if(oConvertUtils.isNotEmpty(pid)) {
 			int count = this.count(new QueryWrapper<SysPermission>().lambda().eq(SysPermission::getParentId, pid));
-			if (count == 1) {
+			if(count==1) {
 				//若父节点无其他子节点，则该父节点是叶子节点
 				this.sysPermissionMapper.setMenuLeaf(pid, 1);
 			}
@@ -82,7 +84,7 @@ public class SysPermissionServiceImpl extends ServiceImpl<SysPermissionMapper, S
 		this.removeChildrenBy(sysPermission.getId());
 		//关联删除
 		Map map = new HashMap<>();
-		map.put("permission_id", id);
+		map.put("permission_id",id);
 		//删除数据规则
 		this.deletePermRuleByPermId(id);
 		//删除角色授权表
@@ -113,7 +115,7 @@ public class SysPermissionServiceImpl extends ServiceImpl<SysPermissionMapper, S
 			for (int i = 0, len = permissionList.size(); i < len; i++) {
 				id = permissionList.get(i).getId();
 				Map map = new HashMap<>();
-				map.put("permission_id", id);
+				map.put("permission_id",id);
 				//删除数据规则
 				this.deletePermRuleByPermId(id);
 				//删除角色授权表
@@ -226,12 +228,12 @@ public class SysPermissionServiceImpl extends ServiceImpl<SysPermissionMapper, S
 		query.eq(SysPermissionDataRule::getPermissionId, id);
 		int countValue = this.permissionDataRuleService.count(query);
 		if(countValue > 0) {
-			this.permissionDataRuleService.remove(query);
+			this.permissionDataRuleService.remove(query);	
 		}
 	}
 
 	/**
-	 * 获取模糊匹配规则的数据权限URL
+	  *   获取模糊匹配规则的数据权限URL
 	 */
 	@Override
 	@Cacheable(value = CacheConstant.SYS_DATA_PERMISSIONS_CACHE)
@@ -241,10 +243,10 @@ public class SysPermissionServiceImpl extends ServiceImpl<SysPermissionMapper, S
 
 	@Override
 	public boolean hasPermission(String username, SysPermission sysPermission) {
-		int count = baseMapper.queryCountByUsername(username, sysPermission);
-		if (count > 0) {
+		int count = baseMapper.queryCountByUsername(username,sysPermission);
+		if(count>0){
 			return true;
-		} else {
+		}else{
 			return false;
 		}
 	}
@@ -253,10 +255,10 @@ public class SysPermissionServiceImpl extends ServiceImpl<SysPermissionMapper, S
 	public boolean hasPermission(String username, String url) {
 		SysPermission sysPermission = new SysPermission();
 		sysPermission.setUrl(url);
-		int count = baseMapper.queryCountByUsername(username, sysPermission);
-		if (count > 0) {
+		int count = baseMapper.queryCountByUsername(username,sysPermission);
+		if(count>0){
 			return true;
-		} else {
+		}else{
 			return false;
 		}
 	}

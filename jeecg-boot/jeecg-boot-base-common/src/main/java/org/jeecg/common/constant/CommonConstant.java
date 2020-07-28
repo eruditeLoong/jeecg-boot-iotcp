@@ -116,13 +116,13 @@ public interface CommonConstant {
     public static final String SMS_TPL_TYPE_0  = "0";
     public static final String SMS_TPL_TYPE_1  = "1";
     public static final String SMS_TPL_TYPE_2  = "2";
-
+    
     /**
      * 状态(0无效1有效)
      */
     public static final String STATUS_0 = "0";
     public static final String STATUS_1 = "1";
-
+    
     /**
      * 同步工作流引擎1同步0不同步
      */
@@ -134,7 +134,7 @@ public interface CommonConstant {
      */
     public static final String MSG_CATEGORY_1 = "1";
     public static final String MSG_CATEGORY_2 = "2";
-
+    
     /**
      * 是否配置菜单的数据权限 1是0否
      */
@@ -223,37 +223,21 @@ public interface CommonConstant {
     public static final Integer USER_IDENTITY_1 = 1;
     public static final Integer USER_IDENTITY_2 = 2;
 
-    /**
-     * sys_user 表 username 唯一键索引
-     */
+    /** sys_user 表 username 唯一键索引 */
     public static final String SQL_INDEX_UNIQ_SYS_USER_USERNAME = "uniq_sys_user_username";
-    /**
-     * sys_user 表 work_no 唯一键索引
-     */
+    /** sys_user 表 work_no 唯一键索引 */
     public static final String SQL_INDEX_UNIQ_SYS_USER_WORK_NO = "uniq_sys_user_work_no";
-    /**
-     * sys_user 表 phone 唯一键索引
-     */
+    /** sys_user 表 phone 唯一键索引 */
     public static final String SQL_INDEX_UNIQ_SYS_USER_PHONE = "uniq_sys_user_phone";
-    /**
-     * sys_user 表 email 唯一键索引
-     */
+    /** sys_user 表 email 唯一键索引 */
     public static final String SQL_INDEX_UNIQ_SYS_USER_EMAIL = "uniq_sys_user_email";
-    /**
-     * sys_quartz_job 表 job_class_name 唯一键索引
-     */
+    /** sys_quartz_job 表 job_class_name 唯一键索引 */
     public static final String SQL_INDEX_UNIQ_JOB_CLASS_NAME = "uniq_job_class_name";
-    /**
-     * sys_position 表 code 唯一键索引
-     */
+    /** sys_position 表 code 唯一键索引 */
     public static final String SQL_INDEX_UNIQ_CODE = "uniq_code";
-    /**
-     * sys_role 表 code 唯一键索引
-     */
+    /** sys_role 表 code 唯一键索引 */
     public static final String SQL_INDEX_UNIQ_SYS_ROLE_CODE = "uniq_sys_role_role_code";
-    /**
-     * sys_depart 表 code 唯一键索引
-     */
+    /** sys_depart 表 code 唯一键索引 */
     public static final String SQL_INDEX_UNIQ_DEPART_ORG_CODE = "uniq_depart_org_code";
     /**
      * 在线聊天 是否为默认分组
@@ -278,4 +262,19 @@ public interface CommonConstant {
      */
     public static final String SIGN_PATCH_BIZ_STATUS_1 = "1";
     public static final String SIGN_PATCH_BIZ_STATUS_2 = "2";
+
+    /**
+     * 公文文档上传自定义路径
+     */
+    public static final String UPLOAD_CUSTOM_PATH_OFFICIAL = "officialdoc";
+     /**
+     * 公文文档下载自定义路径
+     */
+    public static final String DOWNLOAD_CUSTOM_PATH_OFFICIAL = "officaldown";
+
+    /**
+     * WPS存储值类别(1 code文号 2 text（WPS模板还是公文发文模板）)
+     */
+    public static final String WPS_TYPE_1="1";
+    public static final String WPS_TYPE_2="2";
 }

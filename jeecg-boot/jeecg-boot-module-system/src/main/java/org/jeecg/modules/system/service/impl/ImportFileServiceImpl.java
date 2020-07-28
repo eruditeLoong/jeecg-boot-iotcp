@@ -16,7 +16,7 @@ public class ImportFileServiceImpl implements ImportFileServiceI {
     @Value("${jeecg.path.upload}")
     private String upLoadPath;
 
-    @Value(value = "${jeecg.uploadType}")
+    @Value(value="${jeecg.uploadType}")
     private String uploadType;
 
     @Override

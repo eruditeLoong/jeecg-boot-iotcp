@@ -3,10 +3,12 @@ package org.jeecg.modules.system.controller;
 import cn.hutool.core.util.RandomUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.aliyuncs.exceptions.ClientException;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.constant.CacheConstant;
 import org.jeecg.common.constant.CommonConstant;
@@ -47,17 +49,17 @@ public class LoginController {
 	@Autowired
 	private ISysLogService logService;
 	@Autowired
-	private RedisUtil redisUtil;
+    private RedisUtil redisUtil;
 	@Autowired
-	private ISysDepartService sysDepartService;
+    private ISysDepartService sysDepartService;
 	@Autowired
-	private ISysDictService sysDictService;
+    private ISysDictService sysDictService;
 
 	private static final String BASE_CHECK_CODES = "qwertyuiplkjhgfdsazxcvbnmQWERTYUPLKJHGFDSAZXCVBNM1234567890";
 
 	@ApiOperation("登录接口")
 	@RequestMapping(value = "/login", method = RequestMethod.POST)
-	public Result<JSONObject> login(@RequestBody SysLoginModel sysLoginModel) {
+	public Result<JSONObject> login(@RequestBody SysLoginModel sysLoginModel){
 		Result<JSONObject> result = new Result<JSONObject>();
 		String username = sysLoginModel.getUsername();
 		String password = sysLoginModel.getPassword();
@@ -82,7 +84,11 @@ public class LoginController {
 		//update-end-author:taoyan date:20190828 for:校验验证码
 		
 		//1. 校验用户是否有效
-		SysUser sysUser = sysUserService.getUserByName(username);
+		//update-begin-author:wangshuai date:20200601 for: 登录代码验证用户是否注销bug，if条件永远为false
+		LambdaQueryWrapper<SysUser> queryWrapper = new LambdaQueryWrapper<>();
+		queryWrapper.eq(SysUser::getUsername,username);
+		SysUser sysUser = sysUserService.getOne(queryWrapper);
+		//update-end-author:wangshuai date:20200601 for: 登录代码验证用户是否注销bug，if条件永远为false
 		result = sysUserService.checkUserIsEffective(sysUser);
 		if(!result.isSuccess()) {
 			return result;
@@ -255,6 +261,10 @@ public class LoginController {
 				SysUser sysUser = sysUserService.getUserByPhone(mobile);
 				result = sysUserService.checkUserIsEffective(sysUser);
 				if(!result.isSuccess()) {
+					String message = result.getMessage();
+					if("该用户不存在，请注册".equals(message)){
+						result.error500("该用户不存在或未绑定手机号");
+					}
 					return result;
 				}
 				
@@ -377,18 +387,17 @@ public class LoginController {
 
 	/**
 	 * 后台生成图形验证码 ：有效
-	 *
 	 * @param response
 	 * @param key
 	 */
 	@ApiOperation("获取验证码")
 	@GetMapping(value = "/randomImage/{key}")
-	public Result<String> randomImage(HttpServletResponse response, @PathVariable String key) {
+	public Result<String> randomImage(HttpServletResponse response,@PathVariable String key){
 		Result<String> res = new Result<String>();
 		try {
-			String code = RandomUtil.randomString(BASE_CHECK_CODES, 4);
+			String code = RandomUtil.randomString(BASE_CHECK_CODES,4);
 			String lowerCaseCode = code.toLowerCase();
-			String realKey = MD5Util.MD5Encode(lowerCaseCode + key, "utf-8");
+			String realKey = MD5Util.MD5Encode(lowerCaseCode+key, "utf-8");
 			redisUtil.set(realKey, lowerCaseCode, 60);
 			String base64 = RandImageUtil.generate(code);
 			res.setSuccess(true);
@@ -447,7 +456,7 @@ public class LoginController {
 		String token = JwtUtil.sign(username, syspassword);
 		// 设置超时时间
 		redisUtil.set(CommonConstant.PREFIX_USER_TOKEN + token, token);
-		redisUtil.expire(CommonConstant.PREFIX_USER_TOKEN + token, JwtUtil.EXPIRE_TIME * 2 / 1000);
+		redisUtil.expire(CommonConstant.PREFIX_USER_TOKEN + token, JwtUtil.EXPIRE_TIME*2 / 1000);
 		//token 信息
 		obj.put("token", token);
 		result.setResult(obj);
@@ -459,21 +468,20 @@ public class LoginController {
 
 	/**
 	 * 图形验证码
-	 *
 	 * @param sysLoginModel
 	 * @return
 	 */
 	@RequestMapping(value = "/checkCaptcha", method = RequestMethod.POST)
-	public Result<?> checkCaptcha(@RequestBody SysLoginModel sysLoginModel) {
+	public Result<?> checkCaptcha(@RequestBody SysLoginModel sysLoginModel){
 		String captcha = sysLoginModel.getCaptcha();
 		String checkKey = sysLoginModel.getCheckKey();
-		if (captcha == null) {
+		if(captcha==null){
 			return Result.error("验证码无效");
 		}
 		String lowerCaseCaptcha = captcha.toLowerCase();
-		String realKey = MD5Util.MD5Encode(lowerCaseCaptcha + checkKey, "utf-8");
+		String realKey = MD5Util.MD5Encode(lowerCaseCaptcha+checkKey, "utf-8");
 		Object checkCode = redisUtil.get(realKey);
-		if (checkCode == null || !checkCode.equals(lowerCaseCaptcha)) {
+		if(checkCode==null || !checkCode.equals(lowerCaseCaptcha)) {
 			return Result.error("验证码错误");
 		}
 		return Result.ok();

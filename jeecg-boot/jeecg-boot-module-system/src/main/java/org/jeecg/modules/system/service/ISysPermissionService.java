@@ -1,11 +1,13 @@
 package org.jeecg.modules.system.service;
 
-import com.baomidou.mybatisplus.extension.service.IService;
+import java.util.List;
+
+import org.apache.ibatis.annotations.Param;
 import org.jeecg.common.exception.JeecgBootException;
 import org.jeecg.modules.system.entity.SysPermission;
 import org.jeecg.modules.system.model.TreeModel;
 
-import java.util.List;
+import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
  * <p>
@@ -32,22 +34,20 @@ public interface ISysPermissionService extends IService<SysPermission> {
 	
 	/**
 	 * 根据permissionId删除其关联的SysPermissionDataRule表中的数据
-	 *
+	 * 
 	 * @param id
 	 * @return
 	 */
 	public void deletePermRuleByPermId(String id);
-
+	
 	/**
-	 * 查询出带有特殊符号的菜单地址的集合
-	 *
+	  * 查询出带有特殊符号的菜单地址的集合
 	 * @return
 	 */
 	public List<String> queryPermissionUrlWithStar();
 
 	/**
 	 * 判断用户否拥有权限
-	 *
 	 * @param username
 	 * @param sysPermission
 	 * @return
@@ -56,7 +56,6 @@ public interface ISysPermissionService extends IService<SysPermission> {
 
 	/**
 	 * 根据用户和请求地址判断是否有此权限
-	 *
 	 * @param username
 	 * @param url
 	 * @return

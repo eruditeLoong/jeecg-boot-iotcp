@@ -1,5 +1,7 @@
 package org.jeecg.modules.system.entity;
 
+import java.io.Serializable;
+import java.util.Date;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -7,9 +9,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 import org.jeecg.common.aspect.annotation.Dict;
-
-import java.io.Serializable;
-import java.util.Date;
+import org.jeecgframework.poi.excel.annotation.Excel;
 
 /**
  * <p>
@@ -161,20 +161,20 @@ public class SysPermission implements Serializable {
     }
     public SysPermission(boolean index) {
     	if(index) {
-			this.id = "9502685863ab87f0ad1134142788a385";
-			this.name = "首页";
-			this.component = "dashboard/Analysis";
-			this.componentName = "dashboard-analysis";
-			this.url = "/dashboard/analysis";
-			this.icon = "home";
-			this.menuType = 0;
-			this.sortNo = 0.0;
-			this.ruleFlag = 0;
-			this.delFlag = 0;
-			this.alwaysShow = false;
-			this.route = true;
-			this.keepAlive = true;
-			this.leaf = true;
+    		this.id = "9502685863ab87f0ad1134142788a385";
+        	this.name="首页";
+        	this.component="dashboard/Analysis";
+        	this.componentName="dashboard-analysis";
+        	this.url="/dashboard/analysis";
+        	this.icon="home";
+        	this.menuType=0;
+        	this.sortNo=0.0;
+        	this.ruleFlag=0;
+        	this.delFlag=0;
+        	this.alwaysShow=false;
+        	this.route=true;
+        	this.keepAlive=true;
+        	this.leaf=true;
         	this.hidden=false;
     	}
     	

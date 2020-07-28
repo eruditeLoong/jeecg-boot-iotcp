@@ -1,11 +1,13 @@
 package org.jeecg.modules.system.service.impl;
 
+import java.util.List;
+import java.util.Map;
+
 import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.jeecg.common.constant.FillRuleConstant;
 import org.jeecg.common.exception.JeecgBootException;
 import org.jeecg.common.util.FillRuleUtil;
+import org.jeecg.common.util.YouBianCodeUtil;
 import org.jeecg.common.util.oConvertUtils;
 import org.jeecg.modules.system.entity.SysCategory;
 import org.jeecg.modules.system.mapper.SysCategoryMapper;
@@ -13,8 +15,8 @@ import org.jeecg.modules.system.model.TreeSelectModel;
 import org.jeecg.modules.system.service.ISysCategoryService;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Map;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 /**
  * @Description: 分类字典
@@ -37,7 +39,7 @@ public class SysCategoryServiceImpl extends ServiceImpl<SysCategoryMapper, SysCa
 			if(!ISysCategoryService.ROOT_PID_VALUE.equals(categoryPid)){
 				SysCategory parent = baseMapper.selectById(categoryPid);
 				parentCode = parent.getCode();
-				if (parent != null && !"1".equals(parent.getHasChild())) {
+				if(parent!=null && !"1".equals(parent.getHasChild())){
 					parent.setHasChild("1");
 					baseMapper.updateById(parent);
 				}
@@ -45,8 +47,8 @@ public class SysCategoryServiceImpl extends ServiceImpl<SysCategoryMapper, SysCa
 		}
 		//update-begin--Author:baihailong  Date:20191209 for：分类字典编码规则生成器做成公用配置
 		JSONObject formData = new JSONObject();
-		formData.put("pid", categoryPid);
-		categoryCode = (String) FillRuleUtil.executeRule(FillRuleConstant.CATEGORY, formData);
+		formData.put("pid",categoryPid);
+		categoryCode = (String) FillRuleUtil.executeRule(FillRuleConstant.CATEGORY,formData);
 		//update-end--Author:baihailong  Date:20191209 for：分类字典编码规则生成器做成公用配置
 		sysCategory.setCode(categoryCode);
 		sysCategory.setPid(categoryPid);

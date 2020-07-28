@@ -1,19 +1,21 @@
 package org.jeecg.modules.system.service;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.extension.service.IService;
+
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.system.vo.SysUserCacheInfo;
 import org.jeecg.modules.system.entity.SysUser;
+
+import com.baomidou.mybatisplus.extension.service.IService;
 import org.jeecg.modules.system.model.SysUserSysDepartModel;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * <p>
@@ -213,22 +215,20 @@ public interface ISysUserService extends IService<SysUser> {
 	 */
 	boolean removeLogicDeleted(List<String> userIds);
 
-	/**
-	 * 更新手机号、邮箱空字符串为 null
-	 */
-	@Transactional(rollbackFor = Exception.class)
-	boolean updateNullPhoneEmail();
+    /**
+     * 更新手机号、邮箱空字符串为 null
+     */
+    @Transactional(rollbackFor = Exception.class)
+    boolean updateNullPhoneEmail();
 
 	/**
 	 * 保存第三方用户信息
-	 *
 	 * @param sysUser
 	 */
 	void saveThirdUser(SysUser sysUser);
 
 	/**
 	 * 根据部门Ids查询
-	 *
 	 * @param
 	 * @return
 	 */

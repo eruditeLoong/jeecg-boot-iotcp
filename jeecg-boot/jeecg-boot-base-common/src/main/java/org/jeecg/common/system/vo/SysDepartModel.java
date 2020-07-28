@@ -14,17 +14,11 @@ public class SysDepartModel {
     private String departNameEn;
     /**缩写*/
     private String departNameAbbr;
-    /**
-     * 排序
-     */
+    /**排序*/
     private Integer departOrder;
-    /**
-     * 描述
-     */
+    /**描述*/
     private String description;
-    /**
-     * 机构类别 1组织机构，2岗位
-     */
+    /**机构类别 1组织机构，2岗位*/
     private String orgCategory;
     /**机构类型*/
     private String orgType;

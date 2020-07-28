@@ -113,7 +113,7 @@ public class TcpDynamicEncoder extends MessageToMessageEncoder<CharSequence> {
                 out.add(Unpooled.wrappedBuffer(HexConvertUtil.hexStringToBytes(value)));
             }
             // 调用自定义编码
-            protocolProvider.encoder(ctx, msgObj, out);
+//            protocolProvider.encoder(ctx, msgObj, out);
         } else {
             // 私有协议，直接发送
             out.add(JSONObject.parseObject(String.valueOf(ByteBufUtil.encodeString(ctx.alloc(), CharBuffer.wrap(msg), CharsetUtil.UTF_8))));

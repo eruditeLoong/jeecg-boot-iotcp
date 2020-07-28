@@ -1,6 +1,12 @@
 package org.jeecg.modules.system.aspect;
 
-import com.alibaba.fastjson.JSONObject;
+import java.lang.reflect.Method;
+import java.util.Date;
+
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.shiro.SecurityUtils;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -19,14 +25,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import java.lang.reflect.Method;
-import java.util.Date;
+import com.alibaba.fastjson.JSONObject;
+import org.springframework.web.multipart.MultipartFile;
 
 
 /**
  * 系统日志，切面处理类
- * 
+ *
  * @Author scott
  * @email jeecgos@163.com
  * @Date 2018年1月14日
@@ -36,10 +41,10 @@ import java.util.Date;
 public class AutoLogAspect {
 	@Autowired
 	private ISysLogService sysLogService;
-	
+
 	@Pointcut("@annotation(org.jeecg.common.aspect.annotation.AutoLog)")
-	public void logPointCut() { 
-		
+	public void logPointCut() {
+
 	}
 
 	@Around("logPointCut()")
@@ -66,7 +71,7 @@ public class AutoLogAspect {
 			//注解上的描述,操作日志内容
 			sysLog.setLogContent(syslog.value());
 			sysLog.setLogType(syslog.logType());
-			
+
 		}
 
 		//请求的方法名
@@ -83,14 +88,14 @@ public class AutoLogAspect {
 		//获取request
 		HttpServletRequest request = SpringContextUtils.getHttpServletRequest();
 		//请求的参数
-		sysLog.setRequestParam(getReqestParams(request, joinPoint));
+		sysLog.setRequestParam(getReqestParams(request,joinPoint));
 
 		//设置IP地址
 		sysLog.setIp(IPUtils.getIpAddr(request));
 
 		//获取登录用户信息
-		LoginUser sysUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
-		if (sysUser != null) {
+		LoginUser sysUser = (LoginUser)SecurityUtils.getSubject().getPrincipal();
+		if(sysUser!=null){
 			sysLog.setUserid(sysUser.getUsername());
 			sysLog.setUsername(sysUser.getRealname());
 
@@ -118,31 +123,43 @@ public class AutoLogAspect {
         	return CommonConstant.OPERATE_TYPE_3;
 		}
         if (methodName.startsWith("delete")) {
-			return CommonConstant.OPERATE_TYPE_4;
+        	return CommonConstant.OPERATE_TYPE_4;
 		}
-		if (methodName.startsWith("import")) {
-			return CommonConstant.OPERATE_TYPE_5;
+        if (methodName.startsWith("import")) {
+        	return CommonConstant.OPERATE_TYPE_5;
 		}
-		if (methodName.startsWith("export")) {
-			return CommonConstant.OPERATE_TYPE_6;
+        if (methodName.startsWith("export")) {
+        	return CommonConstant.OPERATE_TYPE_6;
 		}
 		return CommonConstant.OPERATE_TYPE_1;
 	}
 
 	/**
-	 * @param request:   request
-	 * @param joinPoint: joinPoint
-	 * @Description: 获取请求参数
-	 * @author: scott
-	 * @date: 2020/4/16 0:10
-	 * @Return: java.lang.String
-	 */
+	* @Description: 获取请求参数
+	* @author: scott
+	* @date: 2020/4/16 0:10
+	* @param request:  request
+	* @param joinPoint:  joinPoint
+	* @Return: java.lang.String
+	*/
 	private String getReqestParams(HttpServletRequest request, JoinPoint joinPoint) {
 		String httpMethod = request.getMethod();
 		String params = "";
 		if ("POST".equals(httpMethod) || "PUT".equals(httpMethod) || "PATCH".equals(httpMethod)) {
 			Object[] paramsArray = joinPoint.getArgs();
-			params = JSONObject.toJSONString(paramsArray);
+			// java.lang.IllegalStateException: It is illegal to call this method if the current request is not in asynchronous mode (i.e. isAsyncStarted() returns false)
+             //  https://my.oschina.net/mengzhang6/blog/2395893
+			 Object[] arguments  = new Object[paramsArray.length];
+			for (int i = 0; i < paramsArray.length; i++) {
+				if (paramsArray[i] instanceof ServletRequest || paramsArray[i] instanceof ServletResponse || paramsArray[i] instanceof MultipartFile) {
+					//ServletRequest不能序列化，从入参里排除，否则报异常：java.lang.IllegalStateException: It is illegal to call this method if the current request is not in asynchronous mode (i.e. isAsyncStarted() returns false)
+					//ServletResponse不能序列化 从入参里排除，否则报异常：java.lang.IllegalStateException: getOutputStream() has already been called for this response
+					continue;
+				}
+				arguments[i] = paramsArray[i];
+			}
+
+			params = JSONObject.toJSONString(arguments);
 		} else {
 			MethodSignature signature = (MethodSignature) joinPoint.getSignature();
 			Method method = signature.getMethod();

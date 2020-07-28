@@ -1,5 +1,6 @@
 package org.jeecg.modules.network.network.tcp;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -56,7 +57,11 @@ public class TcpServerDataDealHandler extends ChannelInboundHandlerAdapter {
         dataReportService = ApplicationContextUtil.getContext().getBean(DataReportServiceImpl.class);
         deviceInstanceService = ApplicationContextUtil.getContext().getBean(DeviceInstanceServiceImpl.class);
 
-        receiveMessage = new ReceiveMessage(object.toString());
+        receiveMessage = JSONObject.toJavaObject(JSONObject.parseObject(object.toString()), receiveMessage.getClass());
+
+        System.out.println(">>>>>"+receiveMessage.toString());
+
+//        receiveMessage = new ReceiveMessage(object.toString());
 
         // 拿到传过来的msg数据，开始处理
         if (MessageType.HEART.getCode().equals(receiveMessage.getType())) {

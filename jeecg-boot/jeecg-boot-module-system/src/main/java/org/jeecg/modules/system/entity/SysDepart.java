@@ -6,11 +6,13 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import org.jeecg.common.aspect.annotation.Dict;
+import org.jeecg.modules.system.model.SysDepartTreeModel;
 import org.jeecgframework.poi.excel.annotation.Excel;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -39,24 +41,16 @@ public class SysDepart implements Serializable {
 	private String departNameEn;
 	/**缩写*/
 	private String departNameAbbr;
-	/**
-	 * 排序
-	 */
-	@Excel(name = "排序", width = 15)
+	/**排序*/
+	@Excel(name="排序",width=15)
 	private Integer departOrder;
-	/**
-	 * 描述
-	 */
-	@Excel(name = "描述", width = 15)
+	/**描述*/
+	@Excel(name="描述",width=15)
 	private String description;
-	/**
-	 * 机构类别 1组织机构，2岗位
-	 */
-	@Excel(name = "机构类别", width = 15, dicCode = "org_category")
+	/**机构类别 1组织机构，2岗位*/
+	@Excel(name="机构类别",width=15,dicCode="org_category")
 	private String orgCategory;
-	/**
-	 * 机构类型
-	 */
+	/**机构类型*/
 	private String orgType;
 	/**机构编码*/
 	@Excel(name="机构编码",width=15)

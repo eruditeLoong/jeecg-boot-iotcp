@@ -1,11 +1,11 @@
 package org.jeecg.modules.system.aspect;
 
-import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.extern.slf4j.Slf4j;
+import java.lang.reflect.Field;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -19,11 +19,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import java.lang.reflect.Field;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @Description: 字典aop类
@@ -123,8 +125,7 @@ public class DictAspect {
     }
 
     /**
-     * 翻译字典文本
-     *
+     *  翻译字典文本
      * @param code
      * @param text
      * @param table
@@ -144,8 +145,8 @@ public class DictAspect {
                 continue; //跳过循环
             }
             if (!StringUtils.isEmpty(table)){
-                log.debug("--DictAspect------dicTable=" + table + " ,dicText= " + text + " ,dicCode=" + code);
-                tmpValue = dictService.queryTableDictTextByKey(table, text, code, k.trim());
+                log.debug("--DictAspect------dicTable="+ table+" ,dicText= "+text+" ,dicCode="+code);
+                tmpValue= dictService.queryTableDictTextByKey(table,text,code,k.trim());
             }else {
                 tmpValue = dictService.queryDictTextByKey(code, k.trim());
             }

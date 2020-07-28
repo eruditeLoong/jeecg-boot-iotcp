@@ -1,11 +1,16 @@
 package org.jeecg.modules.system.controller;
 
-import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import lombok.extern.slf4j.Slf4j;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.jeecg.common.api.vo.Result;
@@ -15,28 +20,35 @@ import org.jeecg.common.constant.WebsocketConst;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.system.util.JwtUtil;
 import org.jeecg.common.system.vo.LoginUser;
-import org.jeecg.common.system.websocket.WebSocket;
 import org.jeecg.common.util.oConvertUtils;
+import org.jeecg.modules.message.websocket.WebSocket;
 import org.jeecg.modules.system.entity.SysAnnouncement;
 import org.jeecg.modules.system.entity.SysAnnouncementSend;
 import org.jeecg.modules.system.service.ISysAnnouncementSendService;
 import org.jeecg.modules.system.service.ISysAnnouncementService;
+
 import org.jeecgframework.poi.excel.ExcelImportUtil;
 import org.jeecgframework.poi.excel.def.NormalExcelConstants;
 import org.jeecgframework.poi.excel.entity.ExportParams;
 import org.jeecgframework.poi.excel.entity.ImportParams;
 import org.jeecgframework.poi.excel.view.JeecgEntityExcelView;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.*;
+import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @Title: Controller
@@ -218,21 +230,21 @@ public class SysAnnouncementController {
 				result.success("该系统通知发布成功");
 				if(sysAnnouncement.getMsgType().equals(CommonConstant.MSG_TYPE_ALL)) {
 					JSONObject obj = new JSONObject();
-					obj.put(WebsocketConst.MSG_CMD, WebsocketConst.CMD_TOPIC);
+			    	obj.put(WebsocketConst.MSG_CMD, WebsocketConst.CMD_TOPIC);
 					obj.put(WebsocketConst.MSG_ID, sysAnnouncement.getId());
 					obj.put(WebsocketConst.MSG_TXT, sysAnnouncement.getTitile());
-					webSocket.sendAllMessage(obj.toJSONString());
+			    	webSocket.sendAllMessage(obj.toJSONString());
 				}else {
 					// 2.插入用户通告阅读标记表记录
 					String userId = sysAnnouncement.getUserIds();
-					String[] userIds = userId.substring(0, (userId.length() - 1)).split(",");
+					String[] userIds = userId.substring(0, (userId.length()-1)).split(",");
 					String anntId = sysAnnouncement.getId();
 					Date refDate = new Date();
 					JSONObject obj = new JSONObject();
-					obj.put(WebsocketConst.MSG_CMD, WebsocketConst.CMD_USER);
+			    	obj.put(WebsocketConst.MSG_CMD, WebsocketConst.CMD_USER);
 					obj.put(WebsocketConst.MSG_ID, sysAnnouncement.getId());
 					obj.put(WebsocketConst.MSG_TXT, sysAnnouncement.getTitile());
-					webSocket.sendMoreMessage(userIds, obj.toJSONString());
+			    	webSocket.sendMoreMessage(userIds, obj.toJSONString());
 				}
 			}
 		}
@@ -358,42 +370,40 @@ public class SysAnnouncementController {
             } catch (Exception e) {
                 log.error(e.getMessage(),e);
                 return Result.error("文件导入失败！");
-			} finally {
-				try {
-					file.getInputStream().close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		return Result.error("文件导入失败！");
-	}
-
+            } finally {
+                try {
+                    file.getInputStream().close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return Result.error("文件导入失败！");
+    }
 	/**
-	 * 同步消息
-	 *
+	 *同步消息
 	 * @param anntId
 	 * @return
 	 */
 	@RequestMapping(value = "/syncNotic", method = RequestMethod.GET)
-	public Result<SysAnnouncement> syncNotic(@RequestParam(name = "anntId", required = false) String anntId, HttpServletRequest request) {
+	public Result<SysAnnouncement> syncNotic(@RequestParam(name="anntId",required=false) String anntId, HttpServletRequest request) {
 		Result<SysAnnouncement> result = new Result<SysAnnouncement>();
 		JSONObject obj = new JSONObject();
-		if (StringUtils.isNotBlank(anntId)) {
+		if(StringUtils.isNotBlank(anntId)){
 			SysAnnouncement sysAnnouncement = sysAnnouncementService.getById(anntId);
-			if (sysAnnouncement == null) {
+			if(sysAnnouncement==null) {
 				result.error500("未找到对应实体");
-			} else {
-				if (sysAnnouncement.getMsgType().equals(CommonConstant.MSG_TYPE_ALL)) {
+			}else {
+				if(sysAnnouncement.getMsgType().equals(CommonConstant.MSG_TYPE_ALL)) {
 					obj.put(WebsocketConst.MSG_CMD, WebsocketConst.CMD_TOPIC);
 					obj.put(WebsocketConst.MSG_ID, sysAnnouncement.getId());
 					obj.put(WebsocketConst.MSG_TXT, sysAnnouncement.getTitile());
 					webSocket.sendAllMessage(obj.toJSONString());
-				} else {
+				}else {
 					// 2.插入用户通告阅读标记表记录
 					String userId = sysAnnouncement.getUserIds();
-					if (oConvertUtils.isNotEmpty(userId)) {
-						String[] userIds = userId.substring(0, (userId.length() - 1)).split(",");
+					if(oConvertUtils.isNotEmpty(userId)){
+						String[] userIds = userId.substring(0, (userId.length()-1)).split(",");
 						obj.put(WebsocketConst.MSG_CMD, WebsocketConst.CMD_USER);
 						obj.put(WebsocketConst.MSG_ID, sysAnnouncement.getId());
 						obj.put(WebsocketConst.MSG_TXT, sysAnnouncement.getTitile());
@@ -401,7 +411,7 @@ public class SysAnnouncementController {
 					}
 				}
 			}
-		} else {
+		}else{
 			obj.put(WebsocketConst.MSG_CMD, WebsocketConst.CMD_TOPIC);
 			obj.put(WebsocketConst.MSG_TXT, "批量设置已读");
 			webSocket.sendAllMessage(obj.toJSONString());

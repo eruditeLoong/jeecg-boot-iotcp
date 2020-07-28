@@ -31,7 +31,7 @@ public class ProtocolDataServiceImpl extends ServiceImpl<ProtocolDataMapper, Pro
     @Autowired
     private DeviceModelMapper deviceModelMapper;
 
-    @Value("jeecg.path.upload")
+    @Value("${jeecg.path.upload}")
     private String uploadPath;
 
     @Override
@@ -48,7 +48,9 @@ public class ProtocolDataServiceImpl extends ServiceImpl<ProtocolDataMapper, Pro
     @Override
     public DataProtocolProvider loadDataProtocolProvider(ProtocolData protocolData) throws Exception {
         log.info("无缓存loadDataProtocolProvider的时候调用这里！");
+        log.info("上传文件路径：{}", uploadPath);
         File file = new File(uploadPath + "/" + protocolData.getPackagePath());//jar包的路径
+        log.info("jar包的路径: {}", file.getAbsolutePath());
         URL url = file.toURI().toURL();
         ClassLoader loader = new URLClassLoader(new URL[]{url});//创建类加载器
         Class<?> cls = loader.loadClass(protocolData.getClassPath());//加载指定类，注意一定要带上类的包名

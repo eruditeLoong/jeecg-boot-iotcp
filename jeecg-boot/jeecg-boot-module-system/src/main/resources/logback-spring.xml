@@ -3,9 +3,6 @@
     <!--定义日志文件的存储地址 -->
     <property name="LOG_HOME" value="../logs"/>
 
-    <include resource="org/springframework/boot/logging/logback/base.xml" />
-    <contextName>logback</contextName>
-
     <!--<property name="COLOR_PATTERN" value="%black(%contextName-) %red(%d{yyyy-MM-dd HH:mm:ss}) %green([%thread]) %highlight(%-5level) %boldMagenta( %replace(%caller{1}){'\t|Caller.{1}0|\r\n', ''})- %gray(%msg%xEx%n)" />-->
     <!-- 控制台输出 -->
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
@@ -60,7 +57,7 @@
             </layout>
         </encoder>
     </appender>
-	<!-- 每天生成一个html格式的日志结束 -->
+    <!-- 每天生成一个html格式的日志结束 -->
 
     <appender name="STASH" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
         <destination>localhost:5044</destination>
@@ -71,19 +68,19 @@
         </encoder>
     </appender>
 
-	<!--myibatis log configure -->
-	<logger name="com.apache.ibatis" level="TRACE" />
-	<logger name="java.sql.Connection" level="DEBUG" />
-	<logger name="java.sql.Statement" level="DEBUG" />
-	<logger name="java.sql.PreparedStatement" level="DEBUG" />
+    <!--myibatis log configure -->
+    <logger name="com.apache.ibatis" level="TRACE"/>
+    <logger name="java.sql.Connection" level="DEBUG"/>
+    <logger name="java.sql.Statement" level="DEBUG"/>
+    <logger name="java.sql.PreparedStatement" level="DEBUG"/>
 
-	<!-- 日志输出级别 -->
-	<root level="INFO">
-<!--		<appender-ref ref="STDOUT" />-->
-		<appender-ref ref="FILE" />
-		<appender-ref ref="HTML" />
-		<appender-ref ref="FILE_HTML" />
-        <appender-ref ref="STASH" />
+    <!-- 日志输出级别 -->
+    <root level="INFO">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="FILE"/>
+        <appender-ref ref="HTML"/>
+        <appender-ref ref="FILE_HTML"/>
+        <appender-ref ref="STASH"/>
     </root>
 
 </configuration>

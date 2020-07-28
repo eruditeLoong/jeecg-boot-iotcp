@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.constant.CommonConstant;
 import org.jeecg.common.system.util.JwtUtil;
@@ -16,10 +17,7 @@ import org.jeecg.modules.system.entity.SysPermissionDataRule;
 import org.jeecg.modules.system.entity.SysRolePermission;
 import org.jeecg.modules.system.model.SysPermissionTree;
 import org.jeecg.modules.system.model.TreeModel;
-import org.jeecg.modules.system.service.ISysDepartPermissionService;
-import org.jeecg.modules.system.service.ISysPermissionDataRuleService;
-import org.jeecg.modules.system.service.ISysPermissionService;
-import org.jeecg.modules.system.service.ISysRolePermissionService;
+import org.jeecg.modules.system.service.*;
 import org.jeecg.modules.system.util.PermissionDataUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -244,12 +242,11 @@ public class SysPermissionController {
 	}
 
 	/**
-	 * 添加菜单
-	 *
+	  * 添加菜单
 	 * @param permission
 	 * @return
 	 */
-	//@RequiresRoles({"admin"})
+	@RequiresRoles({ "admin" })
 	@RequestMapping(value = "/add", method = RequestMethod.POST)
 	public Result<SysPermission> add(@RequestBody SysPermission permission) {
 		Result<SysPermission> result = new Result<SysPermission>();
@@ -265,13 +262,12 @@ public class SysPermissionController {
 	}
 
 	/**
-	 * 编辑菜单
-	 *
+	  * 编辑菜单
 	 * @param permission
 	 * @return
 	 */
-	//@RequiresRoles({"admin"})
-	@RequestMapping(value = "/edit", method = {RequestMethod.PUT, RequestMethod.POST})
+	@RequiresRoles({ "admin" })
+	@RequestMapping(value = "/edit", method = { RequestMethod.PUT, RequestMethod.POST })
 	public Result<SysPermission> edit(@RequestBody SysPermission permission) {
 		Result<SysPermission> result = new Result<>();
 		try {
@@ -286,12 +282,11 @@ public class SysPermissionController {
 	}
 
 	/**
-	 * 删除菜单
-	 *
+	  * 删除菜单
 	 * @param id
 	 * @return
 	 */
-	//@RequiresRoles({"admin"})
+	@RequiresRoles({ "admin" })
 	@RequestMapping(value = "/delete", method = RequestMethod.DELETE)
 	public Result<SysPermission> delete(@RequestParam(name = "id", required = true) String id) {
 		Result<SysPermission> result = new Result<>();
@@ -306,17 +301,16 @@ public class SysPermissionController {
 	}
 
 	/**
-	 * 批量删除菜单
-	 *
+	  * 批量删除菜单
 	 * @param ids
 	 * @return
 	 */
-	//@RequiresRoles({"admin"})
+	@RequiresRoles({ "admin" })
 	@RequestMapping(value = "/deleteBatch", method = RequestMethod.DELETE)
 	public Result<SysPermission> deleteBatch(@RequestParam(name = "ids", required = true) String ids) {
 		Result<SysPermission> result = new Result<>();
 		try {
-			String[] arr = ids.split(",");
+            String[] arr = ids.split(",");
 			for (String id : arr) {
 				if (oConvertUtils.isNotEmpty(id)) {
 					sysPermissionService.deletePermission(id);
@@ -405,11 +399,11 @@ public class SysPermissionController {
 
 	/**
 	 * 保存角色授权
-	 *
+	 * 
 	 * @return
 	 */
 	@RequestMapping(value = "/saveRolePermission", method = RequestMethod.POST)
-	//@RequiresRoles({"admin"})
+	@RequiresRoles({ "admin" })
 	public Result<String> saveRolePermission(@RequestBody JSONObject json) {
 		long start = System.currentTimeMillis();
 		Result<String> result = new Result<>();
@@ -689,6 +683,7 @@ public class SysPermissionController {
 	 * @param sysPermissionDataRule
 	 * @return
 	 */
+	@RequiresRoles({ "admin" })
 	@RequestMapping(value = "/addPermissionRule", method = RequestMethod.POST)
 	public Result<SysPermissionDataRule> addPermissionRule(@RequestBody SysPermissionDataRule sysPermissionDataRule) {
 		Result<SysPermissionDataRule> result = new Result<SysPermissionDataRule>();
@@ -703,6 +698,7 @@ public class SysPermissionController {
 		return result;
 	}
 
+	@RequiresRoles({ "admin" })
 	@RequestMapping(value = "/editPermissionRule", method = { RequestMethod.PUT, RequestMethod.POST })
 	public Result<SysPermissionDataRule> editPermissionRule(@RequestBody SysPermissionDataRule sysPermissionDataRule) {
 		Result<SysPermissionDataRule> result = new Result<SysPermissionDataRule>();
@@ -719,9 +715,10 @@ public class SysPermissionController {
 	/**
 	 * 删除菜单权限数据
 	 * 
-	 * @param sysPermissionDataRule
+	 * @param id
 	 * @return
 	 */
+	@RequiresRoles({ "admin" })
 	@RequestMapping(value = "/deletePermissionRule", method = RequestMethod.DELETE)
 	public Result<SysPermissionDataRule> deletePermissionRule(@RequestParam(name = "id", required = true) String id) {
 		Result<SysPermissionDataRule> result = new Result<SysPermissionDataRule>();
@@ -779,7 +776,7 @@ public class SysPermissionController {
 	 * @return
 	 */
 	@RequestMapping(value = "/saveDepartPermission", method = RequestMethod.POST)
-	//@RequiresRoles({"admin"})
+	@RequiresRoles({ "admin" })
 	public Result<String> saveDepartPermission(@RequestBody JSONObject json) {
 		long start = System.currentTimeMillis();
 		Result<String> result = new Result<>();

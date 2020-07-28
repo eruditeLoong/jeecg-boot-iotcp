@@ -21,27 +21,27 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class WebMvcConfiguration implements WebMvcConfigurer {
 
-    @Value("${jeecg.path.upload}")
-    private String upLoadPath;
-    @Value("${jeecg.path.webapp}")
-    private String webAppPath;
-    @Value("${spring.resource.static-locations}")
-    private String staticLocations;
+	@Value("${jeecg.path.upload}")
+	private String upLoadPath;
+	@Value("${jeecg.path.webapp}")
+	private String webAppPath;
+	@Value("${spring.resource.static-locations}")
+	private String staticLocations;
 
-    @Bean
-    public OnlineInterceptor onlineInterceptor() {
-        return new OnlineInterceptor();
-    }
+	@Bean
+	public OnlineInterceptor onlineInterceptor(){
+		return new OnlineInterceptor();
+	}
 
-    @Bean
-    public CorsFilter corsFilter() {
-        final UrlBasedCorsConfigurationSource urlBasedCorsConfigurationSource = new UrlBasedCorsConfigurationSource();
-        final CorsConfiguration corsConfiguration = new CorsConfiguration();
-        /* 是否允许请求带有验证信息 */
-        corsConfiguration.setAllowCredentials(true);
-        /* 允许访问的客户端域名 */
-        corsConfiguration.addAllowedOrigin("*");
-        /* 允许服务端访问的客户端请求头 */
+	@Bean
+	public CorsFilter corsFilter() {
+		final UrlBasedCorsConfigurationSource urlBasedCorsConfigurationSource = new UrlBasedCorsConfigurationSource();
+		final CorsConfiguration corsConfiguration = new CorsConfiguration();
+		/* 是否允许请求带有验证信息 */
+		corsConfiguration.setAllowCredentials(true);
+		/* 允许访问的客户端域名 */
+		corsConfiguration.addAllowedOrigin("*");
+		/* 允许服务端访问的客户端请求头 */
 		corsConfiguration.addAllowedHeader("*");
 		/* 允许访问的方法名,GET POST等 */
 		corsConfiguration.addAllowedMethod("*");
@@ -57,20 +57,20 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
 		registry.addResourceHandler("/**")
 		.addResourceLocations("file:" + upLoadPath + "//", "file:" + webAppPath + "//")
 		.addResourceLocations(staticLocations.split(","));
-    }
+	}
 
-    /**
-     * 方案一： 默认访问根路径跳转 doc.html页面 （swagger文档页面）
-     * 方案二： 访问根路径改成跳转 index.html页面 （简化部署方案： 可以把前端打包直接放到项目的 webapp，上面的配置）
-     */
-    @Override
-    public void addViewControllers(ViewControllerRegistry registry) {
-        registry.addViewController("/").setViewName("doc.html");
-    }
+	/**
+	 * 方案一： 默认访问根路径跳转 doc.html页面 （swagger文档页面）
+	 * 方案二： 访问根路径改成跳转 index.html页面 （简化部署方案： 可以把前端打包直接放到项目的 webapp，上面的配置）
+	 */
+	@Override
+	public void addViewControllers(ViewControllerRegistry registry) {
+		registry.addViewController("/").setViewName("doc.html");
+	}
 
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        String[] exculudes = new String[]{"/*.html", "/html/**", "/js/**", "/css/**", "/images/**"};
-        registry.addInterceptor(onlineInterceptor()).excludePathPatterns(exculudes).addPathPatterns("/online/cgform/api/**");
-    }
+	@Override
+	public void addInterceptors(InterceptorRegistry registry) {
+		String [] exculudes = new String[]{"/*.html","/html/**","/js/**","/css/**","/images/**"};
+		registry.addInterceptor(onlineInterceptor()).excludePathPatterns(exculudes).addPathPatterns("/online/cgform/api/**");
+	}
 }

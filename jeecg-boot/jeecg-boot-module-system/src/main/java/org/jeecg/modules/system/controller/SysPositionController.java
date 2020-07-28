@@ -7,12 +7,14 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.ss.formula.functions.T;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.aspect.annotation.AutoLog;
 import org.jeecg.common.constant.CommonConstant;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.util.ImportExcelUtil;
 import org.jeecg.common.util.oConvertUtils;
+import org.jeecg.modules.quartz.service.IQuartzJobService;
 import org.jeecg.modules.system.entity.SysPosition;
 import org.jeecg.modules.system.service.ISysPositionService;
 import org.jeecgframework.poi.excel.ExcelImportUtil;
@@ -222,7 +224,7 @@ public class SysPositionController {
      * @return
      */
     @RequestMapping(value = "/importExcel", method = RequestMethod.POST)
-    public Result<?> importExcel(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public Result<?> importExcel(HttpServletRequest request, HttpServletResponse response)throws IOException {
         MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
         Map<String, MultipartFile> fileMap = multipartRequest.getFileMap();
         // 错误信息
@@ -235,10 +237,10 @@ public class SysPositionController {
             params.setHeadRows(1);
             params.setNeedSave(true);
             try {
-                List<Object> listSysPositions = ExcelImportUtil.importExcel(file.getInputStream(), SysPosition.class, params);
-                List<String> list = ImportExcelUtil.importDateSave(listSysPositions, ISysPositionService.class, errorMessage, CommonConstant.SQL_INDEX_UNIQ_CODE);
-                errorLines += list.size();
-                successLines += (listSysPositions.size() - errorLines);
+                List<Object>  listSysPositions = ExcelImportUtil.importExcel(file.getInputStream(), SysPosition.class, params);
+                List<String> list = ImportExcelUtil.importDateSave(listSysPositions, ISysPositionService.class, errorMessage,CommonConstant.SQL_INDEX_UNIQ_CODE);
+                errorLines+=list.size();
+                successLines+=(listSysPositions.size()-errorLines);
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
                 return Result.error("文件导入失败:" + e.getMessage());
@@ -250,7 +252,7 @@ public class SysPositionController {
                 }
             }
         }
-        return ImportExcelUtil.imporReturnRes(errorLines, successLines, errorMessage);
+        return ImportExcelUtil.imporReturnRes(errorLines,successLines,errorMessage);
     }
 
 }

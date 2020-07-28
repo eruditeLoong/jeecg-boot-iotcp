@@ -1,12 +1,15 @@
 package org.jeecg.modules.system.model;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.Data;
+import java.io.Serializable;
+
 import org.springframework.format.annotation.DateTimeFormat;
 
-import java.io.Serializable;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+import lombok.Data;
 
 /**
  * @Description: 用户通告阅读标记表
@@ -43,10 +46,10 @@ public class AnnouncementSendModel implements Serializable {
 	private java.lang.Integer pageNo;
 	/**大小*/
 	private java.lang.Integer pageSize;
-	/**
-	 * 消息类型1:通知公告2:系统消息
-	 */
-	private java.lang.String msgCategory;
+    /**
+     * 消息类型1:通知公告2:系统消息
+     */
+    private java.lang.String msgCategory;
 	/**
 	 * 业务id
 	 */

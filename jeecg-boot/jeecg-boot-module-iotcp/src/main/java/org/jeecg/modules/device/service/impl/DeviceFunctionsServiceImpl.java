@@ -132,7 +132,7 @@ public class DeviceFunctionsServiceImpl extends ServiceImpl<DeviceFunctionsMappe
             String deviceInstanceExtendParams) {
         List<DeviceFunction> deviceFunctionList = this.lambdaQuery()
                 .eq(DeviceFunction::getDeviceModelBy, deviceModelId)
-                .ne(DeviceFunction::getType, "auto")
+                .ne(DeviceFunction::getType, "auto")    // 过滤掉自动执行的功能function
                 .list();
 
         // 将输入参数的数据节点id，换成数据节点对象信息

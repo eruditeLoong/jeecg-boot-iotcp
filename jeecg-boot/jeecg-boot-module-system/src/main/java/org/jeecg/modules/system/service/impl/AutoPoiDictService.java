@@ -1,6 +1,9 @@
 package org.jeecg.modules.system.service.impl;
 
-import lombok.extern.slf4j.Slf4j;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.jeecg.common.system.vo.DictModel;
 import org.jeecg.common.util.oConvertUtils;
 import org.jeecg.modules.system.mapper.SysDictMapper;
@@ -8,8 +11,7 @@ import org.jeecgframework.dict.service.AutoPoiDictServiceI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 描述：AutoPoi Excel注解支持字典参数设置
@@ -50,7 +52,7 @@ public class AutoPoiDictService implements AutoPoiDictServiceI {
 			}
 		}
 		for (DictModel t : dictList) {
-			if (t != null) {
+			if(t!=null){
 				dictReplaces.add(t.getText() + "_" + t.getValue());
 			}
 		}

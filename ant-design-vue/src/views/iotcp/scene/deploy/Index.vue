@@ -25,7 +25,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
 
-import { Storage } from 'three/examples/jsm/Storage';
+import { Storage } from '@api/Storage';
 
 export default {
     name: 'SceneDeploy',
@@ -236,14 +236,14 @@ export default {
                 }
             });
         },
-        
+
         loadObject(){
             let modelFiles = this.sceneConfig.modelFiles.split(',');
             for (let i in modelFiles) {
                 // 先从缓存中读取object
-                
+
                 console.log(this.storage.getBig(modelFiles[i]))
-                
+
                 let dbObj = this.storage.get(modelFiles[i], res=>{
                     console.log('缓存查询结果：', dbObj)
                     if(dbObj == undefined){
@@ -301,7 +301,7 @@ export default {
             let loader = new FBXLoader();
             loader.load(url, object => self.initSceneObj(file, object), self.onProgress);
         },
-        
+
         initSceneObj(key, object){
             const self = this;
             self.storage.setBig(key, JSON.stringify(object))

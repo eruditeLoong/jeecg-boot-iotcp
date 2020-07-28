@@ -12,7 +12,6 @@ import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.aspect.annotation.AutoLog;
 import org.jeecg.common.system.base.controller.JeecgController;
 import org.jeecg.common.system.query.QueryGenerator;
-import org.jeecg.common.system.websocket.WebSocket;
 import org.jeecg.common.util.RedisUtil;
 import org.jeecg.modules.device.entity.DeviceInstance;
 import org.jeecg.modules.network.entity.NetworkService;
@@ -47,8 +46,6 @@ public class NetworkServiceController extends JeecgController<NetworkService, IN
     private INetworkServiceService networkServiceService;
     @Autowired
     private NetworkManager networkManager;
-    @Autowired
-    private WebSocket webSocket;
 
     /**
      * 分页列表查询

@@ -8,6 +8,7 @@ import org.jeecg.common.constant.CacheConstant;
 import org.jeecg.common.constant.CommonConstant;
 import org.jeecg.common.system.vo.DictModel;
 import org.jeecg.common.system.vo.DictQuery;
+import org.jeecg.common.util.oConvertUtils;
 import org.jeecg.modules.system.entity.SysDict;
 import org.jeecg.modules.system.entity.SysDictItem;
 import org.jeecg.modules.system.mapper.SysDictItemMapper;
@@ -44,48 +45,47 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
 
 	/**
 	 * 通过查询指定code 获取字典
-     * @param code
-     * @return
-     */
-    @Override
-    @Cacheable(value = CacheConstant.SYS_DICT_CACHE, key = "#code")
-    public List<DictModel> queryDictItemsByCode(String code) {
-        log.info("无缓存dictCache的时候调用这里！");
-        return sysDictMapper.queryDictItemsByCode(code);
-    }
+	 * @param code
+	 * @return
+	 */
+	@Override
+	@Cacheable(value = CacheConstant.SYS_DICT_CACHE,key = "#code")
+	public List<DictModel> queryDictItemsByCode(String code) {
+		log.info("无缓存dictCache的时候调用这里！");
+		return sysDictMapper.queryDictItemsByCode(code);
+	}
 
-    @Override
-    public Map<String, List<DictModel>> queryAllDictItems() {
-        Map<String, List<DictModel>> res = new HashMap<String, List<DictModel>>();
-        List<SysDict> ls = sysDictMapper.selectList(null);
-        LambdaQueryWrapper<SysDictItem> queryWrapper = new LambdaQueryWrapper<SysDictItem>();
-        queryWrapper.eq(SysDictItem::getStatus, 1);
-        queryWrapper.orderByAsc(SysDictItem::getSortOrder);
-        List<SysDictItem> sysDictItemList = sysDictItemMapper.selectList(queryWrapper);
+	@Override
+	public Map<String, List<DictModel>> queryAllDictItems() {
+		Map<String, List<DictModel>> res = new HashMap<String, List<DictModel>>();
+		List<SysDict> ls = sysDictMapper.selectList(null);
+		LambdaQueryWrapper<SysDictItem> queryWrapper = new LambdaQueryWrapper<SysDictItem>();
+		queryWrapper.eq(SysDictItem::getStatus, 1);
+		queryWrapper.orderByAsc(SysDictItem::getSortOrder);
+		List<SysDictItem> sysDictItemList = sysDictItemMapper.selectList(queryWrapper);
 
-        for (SysDict d : ls) {
-            List<DictModel> dictModelList = sysDictItemList.stream().filter(s -> d.getId().equals(s.getDictId())).map(item -> {
-                DictModel dictModel = new DictModel();
-                dictModel.setText(item.getItemText());
-                dictModel.setValue(item.getItemValue());
-                return dictModel;
-            }).collect(Collectors.toList());
-            res.put(d.getDictCode(), dictModelList);
-        }
-        log.debug("-------登录加载系统字典-----" + res.toString());
-        return res;
-    }
+		for (SysDict d : ls) {
+			List<DictModel> dictModelList = sysDictItemList.stream().filter(s -> d.getId().equals(s.getDictId())).map(item -> {
+				DictModel dictModel = new DictModel();
+				dictModel.setText(item.getItemText());
+				dictModel.setValue(item.getItemValue());
+				return dictModel;
+			}).collect(Collectors.toList());
+			res.put(d.getDictCode(), dictModelList);
+		}
+		log.info("-------登录加载系统字典-----" + res.toString());
+		return res;
+	}
 
-    /**
-     * 通过查询指定code 获取字典值text
-     *
-     * @param code
-     * @param key
-     * @return
-     */
+	/**
+	 * 通过查询指定code 获取字典值text
+	 * @param code
+	 * @param key
+	 * @return
+	 */
 
-    @Override
-    @Cacheable(value = CacheConstant.SYS_DICT_CACHE, key = "#code+':'+#key")
+	@Override
+	@Cacheable(value = CacheConstant.SYS_DICT_CACHE,key = "#code+':'+#key")
 	public String queryDictTextByKey(String code, String key) {
 		log.info("无缓存dictText的时候调用这里！");
 		return sysDictMapper.queryDictTextByKey(code, key);
@@ -134,12 +134,16 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
 	 * @param table
 	 * @param text
 	 * @param code
-	 * @param keyArray
+	 * @param keys (逗号分隔)
 	 * @return
 	 */
 	@Override
 	@Cacheable(value = CacheConstant.SYS_DICT_TABLE_CACHE)
-	public List<String> queryTableDictByKeys(String table, String text, String code, String[] keyArray) {
+	public List<String> queryTableDictByKeys(String table, String text, String code, String keys) {
+		if(oConvertUtils.isEmpty(keys)){
+			return null;
+		}
+		String[] keyArray = keys.split(",");
 		List<DictModel> dicts = sysDictMapper.queryTableDictByKeys(table, text, code, keyArray);
 		List<String> texts = new ArrayList<>(dicts.size());
 		// 查询出来的顺序可能是乱的，需要排个序
@@ -166,20 +170,20 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
     @Override
     @Transactional
     public Integer saveMain(SysDict sysDict, List<SysDictItem> sysDictItemList) {
-        int insert = 0;
-        try {
-            insert = sysDictMapper.insert(sysDict);
-            if (sysDictItemList != null) {
-                for (SysDictItem entity : sysDictItemList) {
-                    entity.setDictId(sysDict.getId());
-                    entity.setStatus(1);
-                    sysDictItemMapper.insert(entity);
-                }
-            }
-        } catch (Exception e) {
-            return insert;
-        }
-        return insert;
+		int insert=0;
+    	try{
+			 insert = sysDictMapper.insert(sysDict);
+			if (sysDictItemList != null) {
+				for (SysDictItem entity : sysDictItemList) {
+					entity.setDictId(sysDict.getId());
+					entity.setStatus(1);
+					sysDictItemMapper.insert(entity);
+				}
+			}
+		}catch(Exception e){
+			return insert;
+		}
+		return insert;
     }
 
 	@Override
@@ -205,23 +209,23 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
 	@Override
 	public void deleteOneDictPhysically(String id) {
 		this.baseMapper.deleteOneById(id);
-		this.sysDictItemMapper.delete(new LambdaQueryWrapper<SysDictItem>().eq(SysDictItem::getDictId, id));
-    }
+		this.sysDictItemMapper.delete(new LambdaQueryWrapper<SysDictItem>().eq(SysDictItem::getDictId,id));
+	}
 
-    @Override
-    public void updateDictDelFlag(int delFlag, String id) {
-        baseMapper.updateDictDelFlag(delFlag, id);
-    }
+	@Override
+	public void updateDictDelFlag(int delFlag, String id) {
+		baseMapper.updateDictDelFlag(delFlag,id);
+	}
 
-    @Override
-    public List<SysDict> queryDeleteList() {
-        return baseMapper.queryDeleteList();
-    }
+	@Override
+	public List<SysDict> queryDeleteList() {
+		return baseMapper.queryDeleteList();
+	}
 
-    @Override
-    public List<DictModel> queryDictTablePageList(DictQuery query, int pageSize, int pageNo) {
-        Page page = new Page(pageNo, pageSize, false);
-        Page<DictModel> pageList = baseMapper.queryDictTablePageList(page, query);
-        return pageList.getRecords();
-    }
+	@Override
+	public List<DictModel> queryDictTablePageList(DictQuery query, int pageSize, int pageNo) {
+		Page page = new Page(pageNo,pageSize,false);
+		Page<DictModel> pageList = baseMapper.queryDictTablePageList(page, query);
+		return pageList.getRecords();
+	}
 }

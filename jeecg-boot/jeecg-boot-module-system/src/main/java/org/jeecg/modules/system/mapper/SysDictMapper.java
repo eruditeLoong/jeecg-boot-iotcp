@@ -1,8 +1,11 @@
 package org.jeecg.modules.system.mapper;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import java.util.List;
+import java.util.Map;
+
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.ResultType;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 import org.jeecg.common.system.vo.DictModel;
@@ -11,8 +14,7 @@ import org.jeecg.modules.system.entity.SysDict;
 import org.jeecg.modules.system.model.DuplicateCheckVo;
 import org.jeecg.modules.system.model.TreeSelectModel;
 
-import java.util.List;
-import java.util.Map;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
  * <p>
@@ -23,48 +25,44 @@ import java.util.Map;
  * @since 2018-12-28
  */
 public interface SysDictMapper extends BaseMapper<SysDict> {
-
+	
 	/**
-	 * 重复检查SQL
-	 *
+	  *  重复检查SQL
 	 * @return
 	 */
 	public Long duplicateCheckCountSql(DuplicateCheckVo duplicateCheckVo);
-
 	public Long duplicateCheckCountSqlNoDataId(DuplicateCheckVo duplicateCheckVo);
-
+	
 	public List<DictModel> queryDictItemsByCode(@Param("code") String code);
 
 	@Deprecated
-	public List<DictModel> queryTableDictItemsByCode(@Param("table") String table, @Param("text") String text, @Param("code") String code);
+	public List<DictModel> queryTableDictItemsByCode(@Param("table") String table,@Param("text") String text,@Param("code") String code);
 
 	@Deprecated
-	public List<DictModel> queryTableDictItemsByCodeAndFilter(@Param("table") String table, @Param("text") String text, @Param("code") String code, @Param("filterSql") String filterSql);
+	public List<DictModel> queryTableDictItemsByCodeAndFilter(@Param("table") String table,@Param("text") String text,@Param("code") String code,@Param("filterSql") String filterSql);
 
-	public String queryDictTextByKey(@Param("code") String code, @Param("key") String key);
+	public String queryDictTextByKey(@Param("code") String code,@Param("key") String key);
 
 	@Deprecated
-	public String queryTableDictTextByKey(@Param("table") String table, @Param("text") String text, @Param("code") String code, @Param("key") String key);
+	public String queryTableDictTextByKey(@Param("table") String table,@Param("text") String text,@Param("code") String code,@Param("key") String key);
 
 	@Deprecated
 	public List<DictModel> queryTableDictByKeys(@Param("table") String table, @Param("text") String text, @Param("code") String code, @Param("keyArray") String[] keyArray);
 
 	/**
 	 * 查询所有部门 作为字典信息 id -->value,departName -->text
-	 *
 	 * @return
 	 */
 	public List<DictModel> queryAllDepartBackDictModel();
-
+	
 	/**
 	 * 查询所有用户  作为字典信息 username -->value,realname -->text
 	 * @return
 	 */
 	public List<DictModel> queryAllUserBackDictModel();
-
+	
 	/**
 	 * 通过关键字查询出字典表
-	 *
 	 * @param table
 	 * @param text
 	 * @param code
@@ -72,11 +70,10 @@ public interface SysDictMapper extends BaseMapper<SysDict> {
 	 * @return
 	 */
 	@Deprecated
-	public List<DictModel> queryTableDictItems(@Param("table") String table, @Param("text") String text, @Param("code") String code, @Param("keyword") String keyword);
+	public List<DictModel> queryTableDictItems(@Param("table") String table,@Param("text") String text,@Param("code") String code,@Param("keyword") String keyword); 
 
 	/**
-	 * 根据表名、显示字段名、存储字段名 查询树
-	 *
+	  * 根据表名、显示字段名、存储字段名 查询树
 	 * @param table
 	 * @param text
 	 * @param code
@@ -85,7 +82,7 @@ public interface SysDictMapper extends BaseMapper<SysDict> {
 	 * @return
 	 */
 	@Deprecated
-	List<TreeSelectModel> queryTreeList(@Param("query") Map<String, String> query, @Param("table") String table, @Param("text") String text, @Param("code") String code, @Param("pidField") String pidField, @Param("pid") String pid,@Param("hasChildField") String hasChildField);
+	List<TreeSelectModel> queryTreeList(@Param("query") Map<String, String> query,@Param("table") String table,@Param("text") String text,@Param("code") String code,@Param("pidField") String pidField,@Param("pid") String pid,@Param("hasChildField") String hasChildField);
 
 	/**
 	 * 删除
@@ -103,7 +100,6 @@ public interface SysDictMapper extends BaseMapper<SysDict> {
 
 	/**
 	 * 修改状态值
-	 *
 	 * @param delFlag
 	 * @param id
 	 */
@@ -113,7 +109,6 @@ public interface SysDictMapper extends BaseMapper<SysDict> {
 
 	/**
 	 * 分页查询字典表数据
-	 *
 	 * @param page
 	 * @param query
 	 * @return

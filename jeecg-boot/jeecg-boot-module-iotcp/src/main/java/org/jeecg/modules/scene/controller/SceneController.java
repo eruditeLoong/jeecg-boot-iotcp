@@ -2,8 +2,8 @@ package org.jeecg.modules.scene.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.extension.service.additional.query.impl.LambdaQueryChainWrapper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -221,8 +221,6 @@ public class SceneController {
 
     /**
      * 通过当前组织org查询
-     *
-     * @param org
      * @return
      */
     @AutoLog(value = "场景管理-通过当前组织org查询")

@@ -1,32 +1,33 @@
 package org.jeecg.modules.system.controller;
 
+import java.util.*;
+import java.util.stream.Collectors;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.jeecg.common.api.vo.Result;
-import org.jeecg.common.aspect.annotation.AutoLog;
-import org.jeecg.common.system.base.controller.JeecgController;
+import org.jeecg.common.constant.CommonConstant;
 import org.jeecg.common.system.query.QueryGenerator;
+import org.jeecg.common.aspect.annotation.AutoLog;
 import org.jeecg.common.system.vo.LoginUser;
 import org.jeecg.common.util.oConvertUtils;
 import org.jeecg.modules.system.entity.*;
 import org.jeecg.modules.system.service.*;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import lombok.extern.slf4j.Slf4j;
+import org.jeecg.common.system.base.controller.JeecgController;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 
  /**
  * @Description: 部门角色
@@ -86,66 +87,62 @@ public class SysDepartRoleController extends JeecgController<SysDepartRole, ISys
 //		queryWrapper.in("depart_id",deptIds);
 
 		//我的部门，选中部门只能看当前部门下的角色
-		queryWrapper.eq("depart_id", deptId);
+		queryWrapper.eq("depart_id",deptId);
 		IPage<SysDepartRole> pageList = sysDepartRoleService.page(page, queryWrapper);
 		return Result.ok(pageList);
 	}
-
-	 /**
-	  * 添加
-	  *
-	  * @param sysDepartRole
-	  * @return
-	  */
-	 //@RequiresRoles({"admin"})
-	 @ApiOperation(value = "部门角色-添加", notes = "部门角色-添加")
-	 @PostMapping(value = "/add")
-	 public Result<?> add(@RequestBody SysDepartRole sysDepartRole) {
-		 sysDepartRoleService.save(sysDepartRole);
-		 return Result.ok("添加成功！");
-	 }
-
-	 /**
-	  * 编辑
-	  *
-	  * @param sysDepartRole
-	  * @return
-	  */
-	 //@RequiresRoles({"admin"})
-	 @ApiOperation(value = "部门角色-编辑", notes = "部门角色-编辑")
-	 @PutMapping(value = "/edit")
-	 public Result<?> edit(@RequestBody SysDepartRole sysDepartRole) {
-		 sysDepartRoleService.updateById(sysDepartRole);
-		 return Result.ok("编辑成功!");
-	 }
-
-	 /**
-	  * 通过id删除
-	  *
-	  * @param id
-	  * @return
-	  */
-	 //@RequiresRoles({"admin"})
-	 @AutoLog(value = "部门角色-通过id删除")
-	 @ApiOperation(value = "部门角色-通过id删除", notes = "部门角色-通过id删除")
-	 @DeleteMapping(value = "/delete")
-	 public Result<?> delete(@RequestParam(name = "id", required = true) String id) {
-		 sysDepartRoleService.removeById(id);
-		 return Result.ok("删除成功!");
-	 }
-
-	 /**
-	  * 批量删除
-	  *
-	  * @param ids
-	  * @return
-	  */
-	 //@RequiresRoles({"admin"})
-	 @AutoLog(value = "部门角色-批量删除")
-	 @ApiOperation(value = "部门角色-批量删除", notes = "部门角色-批量删除")
-	 @DeleteMapping(value = "/deleteBatch")
-	 public Result<?> deleteBatch(@RequestParam(name = "ids", required = true) String ids) {
-		 this.sysDepartRoleService.removeByIds(Arrays.asList(ids.split(",")));
+	
+	/**
+	 * 添加
+	 *
+	 * @param sysDepartRole
+	 * @return
+	 */
+	@ApiOperation(value="部门角色-添加", notes="部门角色-添加")
+	@PostMapping(value = "/add")
+	public Result<?> add(@RequestBody SysDepartRole sysDepartRole) {
+		sysDepartRoleService.save(sysDepartRole);
+		return Result.ok("添加成功！");
+	}
+	
+	/**
+	 * 编辑
+	 *
+	 * @param sysDepartRole
+	 * @return
+	 */
+	@ApiOperation(value="部门角色-编辑", notes="部门角色-编辑")
+	@PutMapping(value = "/edit")
+	public Result<?> edit(@RequestBody SysDepartRole sysDepartRole) {
+		sysDepartRoleService.updateById(sysDepartRole);
+		return Result.ok("编辑成功!");
+	}
+	
+	/**
+	 * 通过id删除
+	 *
+	 * @param id
+	 * @return
+	 */
+	@AutoLog(value = "部门角色-通过id删除")
+	@ApiOperation(value="部门角色-通过id删除", notes="部门角色-通过id删除")
+	@DeleteMapping(value = "/delete")
+	public Result<?> delete(@RequestParam(name="id",required=true) String id) {
+		sysDepartRoleService.removeById(id);
+		return Result.ok("删除成功!");
+	}
+	
+	/**
+	 * 批量删除
+	 *
+	 * @param ids
+	 * @return
+	 */
+	@AutoLog(value = "部门角色-批量删除")
+	@ApiOperation(value="部门角色-批量删除", notes="部门角色-批量删除")
+	@DeleteMapping(value = "/deleteBatch")
+	public Result<?> deleteBatch(@RequestParam(name="ids",required=true) String ids) {
+		this.sysDepartRoleService.removeByIds(Arrays.asList(ids.split(",")));
 		return Result.ok("批量删除成功！");
 	}
 	
@@ -164,17 +161,15 @@ public class SysDepartRoleController extends JeecgController<SysDepartRole, ISys
 
 	 /**
 	  * 获取部门下角色
-	  *
 	  * @param departId
 	  * @return
 	  */
-	 @RequestMapping(value = "/getDeptRoleList", method = RequestMethod.GET)
-	 public Result<List<SysDepartRole>> getDeptRoleList(@RequestParam(value = "departId") String departId, @RequestParam(value = "userId") String userId) {
-		 Result<List<SysDepartRole>> result = new Result<>();
-		 //查询管理部门下，用户所在部门的所有角色
-		 SysDepart depart = sysDepartService.getById(departId);
-		 List<SysDepartRole> deptRoleList = sysDepartRoleService.queryDeptRoleByDeptAndUser(depart.getOrgCode(), userId);
-		 result.setSuccess(true);
+	@RequestMapping(value = "/getDeptRoleList", method = RequestMethod.GET)
+	public Result<List<SysDepartRole>> getDeptRoleList(@RequestParam(value = "departId") String departId,@RequestParam(value = "userId") String userId){
+		Result<List<SysDepartRole>> result = new Result<>();
+		//查询选中部门的角色
+		List<SysDepartRole> deptRoleList = sysDepartRoleService.list(new LambdaQueryWrapper<SysDepartRole>().eq(SysDepartRole::getDepartId,departId));
+		result.setSuccess(true);
 		result.setResult(deptRoleList);
 		return result;
 	}
@@ -199,9 +194,13 @@ public class SysDepartRoleController extends JeecgController<SysDepartRole, ISys
 	  * @return
 	  */
 	 @RequestMapping(value = "/getDeptRoleByUserId", method = RequestMethod.GET)
-	 public Result<List<SysDepartRoleUser>> getDeptRoleByUserId(@RequestParam(value = "userId") String userId){
+	 public Result<List<SysDepartRoleUser>> getDeptRoleByUserId(@RequestParam(value = "userId") String userId,@RequestParam(value = "departId") String departId){
 		 Result<List<SysDepartRoleUser>> result = new Result<>();
-		 List<SysDepartRoleUser> roleUserList = departRoleUserService.list(new QueryWrapper<SysDepartRoleUser>().eq("user_id",userId));
+		 //查询部门下角色
+		 List<SysDepartRole> roleList = sysDepartRoleService.list(new QueryWrapper<SysDepartRole>().eq("depart_id",departId));
+		 List<String> roleIds = roleList.stream().map(SysDepartRole::getId).collect(Collectors.toList());
+		 //根据角色id,用户id查询已授权角色
+		 List<SysDepartRoleUser> roleUserList = departRoleUserService.list(new QueryWrapper<SysDepartRoleUser>().eq("user_id",userId).in("drole_id",roleIds));
 		 result.setSuccess(true);
 		 result.setResult(roleUserList);
 		 return result;

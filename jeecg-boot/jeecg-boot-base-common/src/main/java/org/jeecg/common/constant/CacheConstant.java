@@ -38,15 +38,15 @@ public interface CacheConstant {
 	public static final String SYS_DEPART_IDS_CACHE = "sys:cache:depart:allids";
 
 
-    /**
-     * 测试缓存key
-     */
-    public static final String TEST_DEMO_CACHE = "test:demo";
+	/**
+	 * 测试缓存key
+	 */
+	public static final String TEST_DEMO_CACHE = "test:demo";
 
-    /**
-     * 字典信息缓存
-     */
-    public static final String SYS_DYNAMICDB_CACHE = "sys:cache:dbconnect:dynamic:";
+	/**
+	 * 字典信息缓存
+	 */
+	public static final String SYS_DYNAMICDB_CACHE = "sys:cache:dbconnect:dynamic:";
 
 	/**
 	 * 设备模型的数据解析对象缓存

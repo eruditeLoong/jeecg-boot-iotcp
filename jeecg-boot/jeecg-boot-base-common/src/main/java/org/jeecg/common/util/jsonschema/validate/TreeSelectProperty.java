@@ -1,10 +1,11 @@
 package org.jeecg.common.util.jsonschema.validate;
 
-import com.alibaba.fastjson.JSONObject;
-import org.jeecg.common.util.jsonschema.CommonProperty;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import org.jeecg.common.util.jsonschema.CommonProperty;
+
+import com.alibaba.fastjson.JSONObject;
 
 /**
  * 字典属性
@@ -12,9 +13,9 @@ import java.util.Map;
  *
  */
 public class TreeSelectProperty extends CommonProperty {
-
+	
 	private static final long serialVersionUID = 3786503639885610767L;
-
+	
 	private String dict;//表名,文本,id
 	private String pidField;//父级字段 默认pid
 	private String pidValue;//父级节点的值 暂时没用到 默认为0
@@ -25,7 +26,7 @@ public class TreeSelectProperty extends CommonProperty {
 	 * 是不是pid 组件 1是 0否
 	 */
 	private Integer pidComponent = 0;
-
+	
 	public String getDict() {
 		return dict;
 	}
@@ -58,8 +59,7 @@ public class TreeSelectProperty extends CommonProperty {
 		this.hasChildField = hasChildField;
 	}
 
-	public TreeSelectProperty() {
-	}
+	public TreeSelectProperty() {}
 
 	public String getTextField() {
 		return textField;
@@ -78,9 +78,9 @@ public class TreeSelectProperty extends CommonProperty {
 	}
 
 	/**
-	 * 构造器 构造普通树形下拉
+	 *  构造器 构造普通树形下拉
 	 */
-	public TreeSelectProperty(String key, String title, String dict, String pidField, String pidValue) {
+	public TreeSelectProperty(String key,String title,String dict,String pidField,String pidValue) {
 		this.type = "string";
 		this.view = "sel_tree";
 		this.key = key;
@@ -125,21 +125,21 @@ public class TreeSelectProperty extends CommonProperty {
 			prop.put("dict",dict);
 		}
 		if(pidField!=null) {
-			prop.put("pidField", pidField);
+			prop.put("pidField",pidField);
 		}
-		if (pidValue != null) {
-			prop.put("pidValue", pidValue);
+		if(pidValue!=null) {
+			prop.put("pidValue",pidValue);
 		}
-		if (textField != null) {
-			prop.put("textField", textField);
+		if(textField!=null) {
+			prop.put("textField",textField);
 		}
-		if (hasChildField != null) {
-			prop.put("hasChildField", hasChildField);
+		if(hasChildField!=null) {
+			prop.put("hasChildField",hasChildField);
 		}
-		if (pidComponent != null) {
-			prop.put("pidComponent", pidComponent);
+		if(pidComponent!=null) {
+			prop.put("pidComponent",pidComponent);
 		}
-		map.put("prop", prop);
+		map.put("prop",prop);
 		return map;
 	}
 

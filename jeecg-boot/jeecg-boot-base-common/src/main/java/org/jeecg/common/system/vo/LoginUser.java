@@ -1,12 +1,14 @@
 package org.jeecg.common.system.vo;
 
+import java.util.Date;
+
+import org.springframework.format.annotation.DateTimeFormat;
+
 import com.fasterxml.jackson.annotation.JsonFormat;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
-import org.springframework.format.annotation.DateTimeFormat;
-
-import java.util.Date;
 
 /**
  * <p>
@@ -76,12 +78,12 @@ public class LoginUser {
 	 * 状态(1：正常 2：冻结 ）
 	 */
 	private Integer status;
-
+	
 	private Integer delFlag;
 	/**
-	 * 同步工作流引擎1同步0不同步
-	 */
-	private Integer activitiSync;
+     * 同步工作流引擎1同步0不同步
+     */
+    private Integer activitiSync;
 
 	/**
 	 * 创建时间
@@ -89,7 +91,7 @@ public class LoginUser {
 	private Date createTime;
 
 	/**
-	 * 身份（1 普通员工 2 上级）
+	 *  身份（1 普通员工 2 上级）
 	 */
 	private Integer userIdentity;
 
@@ -107,5 +109,8 @@ public class LoginUser {
 	 * 座机号
 	 */
 	private String telephone;
+
+	/**多租户id配置，编辑用户的时候设置*/
+	private String relTenantIds;
 
 }

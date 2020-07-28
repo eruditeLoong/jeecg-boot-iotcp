@@ -7,7 +7,7 @@
           <slot name="action"></slot>
         </span>
       </div>
-      <div class="total">{{total}}<slot name="total"></slot></div>
+      <div class="total"><span>{{ total }}</span></div>
     </div>
     <div class="chart-card-content">
       <div class="content-fix">

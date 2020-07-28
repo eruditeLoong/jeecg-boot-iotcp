@@ -4,9 +4,9 @@ import com.alibaba.druid.pool.DruidDataSource;
 import org.jeecg.common.constant.CacheConstant;
 import org.jeecg.common.system.api.ISysBaseAPI;
 import org.jeecg.common.system.vo.DynamicDataSourceModel;
+import org.jeecg.common.util.RedisUtil;
 import org.jeecg.common.util.SpringContextUtils;
 import org.springframework.data.redis.core.RedisTemplate;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,9 +15,7 @@ import java.util.Map;
  * 数据源缓存池
  */
 public class DataSourceCachePool {
-    /**
-     * 数据源连接池缓存【本地 class缓存 - 不支持分布式】
-     */
+    /** 数据源连接池缓存【本地 class缓存 - 不支持分布式】 */
     private static Map<String, DruidDataSource> dbSources = new HashMap<>();
     private static RedisTemplate<String, Object> redisTemplate;
 
@@ -66,10 +64,10 @@ public class DataSourceCachePool {
      */
     public static void cleanAllCache() {
         //关闭数据源连接
-        for (Map.Entry<String, DruidDataSource> entry : dbSources.entrySet()) {
+        for(Map.Entry<String, DruidDataSource> entry : dbSources.entrySet()){
             String dbkey = entry.getKey();
             DruidDataSource druidDataSource = entry.getValue();
-            if (druidDataSource != null && druidDataSource.isEnable()) {
+            if(druidDataSource!=null && druidDataSource.isEnable()){
                 druidDataSource.close();
             }
             //清空redis缓存
@@ -82,7 +80,7 @@ public class DataSourceCachePool {
     public static void removeCache(String dbKey) {
         //关闭数据源连接
         DruidDataSource druidDataSource = dbSources.get(dbKey);
-        if (druidDataSource != null && druidDataSource.isEnable()) {
+        if(druidDataSource!=null && druidDataSource.isEnable()){
             druidDataSource.close();
         }
         //清空redis缓存
