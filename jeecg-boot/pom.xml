@@ -20,6 +20,7 @@
         <module>jeecg-boot-module-smarthome</module>
         <module>jeecg-boot-module-elasticsearch</module>
         <module>jeecg-boot-module-iotcp</module>
+        <module>data-protocol</module>
     </modules>
 
     <distributionManagement>

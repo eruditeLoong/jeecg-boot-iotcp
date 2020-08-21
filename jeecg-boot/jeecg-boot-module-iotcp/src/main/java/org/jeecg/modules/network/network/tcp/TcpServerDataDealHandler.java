@@ -26,7 +26,7 @@ public class TcpServerDataDealHandler extends ChannelInboundHandlerAdapter {
     @Autowired
     private DeviceInstanceServiceImpl deviceInstanceService;
 
-    ReceiveMessage receiveMessage;
+    private ReceiveMessage receiveMessage;
 
     /***************************************************
      * 接收数据格式：
@@ -57,11 +57,9 @@ public class TcpServerDataDealHandler extends ChannelInboundHandlerAdapter {
         dataReportService = ApplicationContextUtil.getContext().getBean(DataReportServiceImpl.class);
         deviceInstanceService = ApplicationContextUtil.getContext().getBean(DeviceInstanceServiceImpl.class);
 
-        receiveMessage = JSONObject.toJavaObject(JSONObject.parseObject(object.toString()), receiveMessage.getClass());
-
-        System.out.println(">>>>>"+receiveMessage.toString());
-
-//        receiveMessage = new ReceiveMessage(object.toString());
+        log.info("接收到数据：{}", object.toString());
+        receiveMessage = JSONObject.toJavaObject(JSONObject.parseObject(object.toString()), ReceiveMessage.class);
+        log.info("接收数据解析：{}", receiveMessage.toString());
 
         // 拿到传过来的msg数据，开始处理
         if (MessageType.HEART.getCode().equals(receiveMessage.getType())) {
@@ -81,8 +79,8 @@ public class TcpServerDataDealHandler extends ChannelInboundHandlerAdapter {
                 dataReport.setData(data.toJSONString());
                 dataReport.setInputMode("report");
                 dataReport.setInstanceDeviceBy(receiveMessage.getDeviceInstanceId());
-                log.info(dataReport.toString());
-                dataReportService.save(dataReport);
+                boolean b = dataReportService.save(dataReport);
+                log.info("保存设备数据[{}]：{}", b, dataReport.toString());
             }
 
         } else if (MessageType.EVENT.getCode().equals(receiveMessage.getType())) {
@@ -94,4 +92,5 @@ public class TcpServerDataDealHandler extends ChannelInboundHandlerAdapter {
     public ReceiveMessage getResponse(){
         return receiveMessage;
     }
+
 }

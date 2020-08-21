@@ -8,6 +8,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.List;
 
 @Slf4j
@@ -41,7 +42,10 @@ public class InstanceStateListener {
 
         if (list != null && list.size() > 0) {
             for (DeviceInstance di : list) {
+                // 设置状态
                 di.setStatus(deviceInstance.getStatus());
+                // 设置状态更新时间
+                di.setStatusUpdateTime(new Date());
                 batchUpdateInstDeviceState(di);
             }
         }

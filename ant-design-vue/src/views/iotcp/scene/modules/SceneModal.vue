@@ -191,8 +191,8 @@
                     }
                 },
                 url: {
-                    add: '/scene/scene/add',
-                    edit: '/scene/scene/edit'
+                    add: '/scene/manage/add',
+                    edit: '/scene/manage/edit',
                 }
             }
         },
@@ -239,7 +239,6 @@
                 this.visible = false
             },
             handleOk() {
-                alert('ok');
                 const self = this
                 // 触发表单验证
                 this.form.validateFields((err, values) => {

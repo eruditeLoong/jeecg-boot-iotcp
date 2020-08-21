@@ -95,6 +95,7 @@ public class ShiroConfig {
 		filterChainDefinitionMap.put("/**/*.jpg", "anon");
 		filterChainDefinitionMap.put("/**/*.png", "anon");
 		filterChainDefinitionMap.put("/**/*.ico", "anon");
+		filterChainDefinitionMap.put("/**/*.json", "anon");
 
 		// update-begin--Author:sunjianlei Date:20190813 for：排除字体格式的后缀
 		filterChainDefinitionMap.put("/**/*.ttf", "anon");
@@ -126,6 +127,12 @@ public class ShiroConfig {
 		filterChainDefinitionMap.put("/websocket/**", "anon");
 		filterChainDefinitionMap.put("/newsWebsocket/**", "anon");
 
+		// 物联网-场景部署
+		filterChainDefinitionMap.put("/scene/deploy/**", "anon");
+		// 物联网-数据大屏展示
+		filterChainDefinitionMap.put("/data/view/**", "anon");
+		filterChainDefinitionMap.put("/deploy/**", "anon");
+
 		// 添加自己的过滤器并且取名为jwt
 		Map<String, Filter> filterMap = new HashMap<String, Filter>(1);
 		filterMap.put("jwt", new JwtFilter());
@@ -133,10 +140,12 @@ public class ShiroConfig {
 		// <!-- 过滤链定义，从上向下顺序执行，一般将/**放在最为下边
 		filterChainDefinitionMap.put("/**", "jwt");
 
+
 		// 未授权界面返回JSON
 		shiroFilterFactoryBean.setUnauthorizedUrl("/sys/common/403");
 		shiroFilterFactoryBean.setLoginUrl("/sys/common/403");
 		shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);
+
 		return shiroFilterFactoryBean;
 	}
 

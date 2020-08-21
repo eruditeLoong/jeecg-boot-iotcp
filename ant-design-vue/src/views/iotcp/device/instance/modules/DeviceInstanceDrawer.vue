@@ -268,7 +268,7 @@
                     listInputParams: '/device/deviceInstance/listInputParams',
                     get: '/device/deviceInstance/queryById',
                     listParent: '/device/deviceInstance/listParentInstanceByCurrentOrg',
-                    listScene: '/scene/scene/listSceneByCurrentOrg',
+                    listScene: '/scene/manage/listSceneByCurrentOrg',
                     listSchemeByScene: '/scene/sceneScheme/listBySceneId'
                 }
             }

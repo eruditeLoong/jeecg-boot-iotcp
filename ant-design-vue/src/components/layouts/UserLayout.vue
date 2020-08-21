@@ -4,12 +4,12 @@
       <div class="top">
         <div class="header">
           <a href="/">
-            <img src="~@/assets/logo.svg" class="logo" alt="logo">
-            <span class="title">Jeecg Boot</span>
+            <img src="~@/assets/logo.png" class="logo" alt="logo">
+            <span class="title">3D物联网平台</span>
           </a>
         </div>
         <div class="desc">
-          Jeecg Boot 是中国最具影响力的 企业级 快速开发平台
+          设备功能自定义、通讯协议可配置的3D物联网平台系统
         </div>
       </div>
 

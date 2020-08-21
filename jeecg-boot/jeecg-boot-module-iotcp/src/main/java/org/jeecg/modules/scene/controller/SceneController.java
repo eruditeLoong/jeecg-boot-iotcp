@@ -1,5 +1,8 @@
 package org.jeecg.modules.scene.controller;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
@@ -12,8 +15,13 @@ import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.aspect.annotation.AutoLog;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.system.vo.LoginUser;
+import org.jeecg.common.util.TokenUtils;
 import org.jeecg.common.util.oConvertUtils;
 import org.jeecg.modules.device.entity.DeviceInstance;
+import org.jeecg.modules.device.entity.DeviceModel;
+import org.jeecg.modules.device.enums.DeviceState;
+import org.jeecg.modules.device.service.IDeviceInstanceService;
+import org.jeecg.modules.device.service.IDeviceModelService;
 import org.jeecg.modules.scene.entity.Scene;
 import org.jeecg.modules.scene.entity.SceneScheme;
 import org.jeecg.modules.scene.service.ISceneSchemeService;
@@ -40,6 +48,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @Description: 场景管理
@@ -49,13 +58,17 @@ import java.util.stream.Collectors;
  */
 @Api(tags = "场景管理")
 @RestController
-@RequestMapping("/scene/scene")
+@RequestMapping("/scene/manage")
 @Slf4j
 public class SceneController {
     @Autowired
     private ISceneService sceneService;
     @Autowired
     private ISceneSchemeService sceneSchemeService;
+    @Autowired
+    private IDeviceInstanceService instanceService;
+    @Autowired
+    private IDeviceModelService deviceModelService;
 
     /**
      * 分页列表查询
@@ -73,16 +86,18 @@ public class SceneController {
                                    @RequestParam(name = "pageNo", defaultValue = "1") Integer pageNo,
                                    @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
                                    HttpServletRequest req) {
+        System.out.println("》》》》" + scene);
         QueryWrapper<Scene> queryWrapper = QueryGenerator.initQueryWrapper(scene, req.getParameterMap());
         Page<Scene> page = new Page<Scene>(pageNo, pageSize);
         IPage<Scene> pageList = sceneService.page(page, queryWrapper);
+        System.out.println("》》》》" + pageList);
         return Result.ok(pageList);
     }
 
     /**
      * 添加
      *
-     * @param scenePage
+     * @param scene
      * @return
      */
     @AutoLog(value = "场景管理-添加")
@@ -96,7 +111,7 @@ public class SceneController {
     /**
      * 编辑
      *
-     * @param scenePage
+     * @param scene
      * @return
      */
     @AutoLog(value = "场景管理-编辑")
@@ -198,7 +213,8 @@ public class SceneController {
     @GetMapping(value = "/getSceneConfig")
     public Result<?> getSceneConfig(@RequestParam(name = "id", required = false) String id) {
         Scene scene = new Scene();
-        if(oConvertUtils.isEmpty(id)){
+        System.out.println(">>>>>>> sceneId: "+id);
+        if(oConvertUtils.isEmpty(id) || "undefined".equals(id)){
             LoginUser sysUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
             log.info("当前用户所属组织：{}",sysUser.getOrgCode());
             List<Scene> list = sceneService.lambdaQuery()
@@ -207,16 +223,39 @@ public class SceneController {
             if(list!=null && list.size()>0){
                 scene = list.get(0);
             }else{
-                return Result.error("未找到对应数据");
+                return Result.error("未找到当前登录用户所属场景数据");
             }
         }else{
             scene = sceneService.getById(id);
             if (scene == null) {
-                return Result.error("未找到对应数据");
+                return Result.error("未找到id为："+id+"的场景");
             }
         }
 
-        return Result.ok(scene);
+        // 设备实例
+        List<DeviceInstance> deviceInstanceList = instanceService.lambdaQuery()
+                .eq(DeviceInstance::getSceneBy, scene.getId())
+                .ne(DeviceInstance::getStatus, DeviceState.NOT_ACTIVE.getCode())
+                .list();
+
+        JSONArray deviceInstanceJsonArray = new JSONArray();
+        deviceInstanceList.forEach(deviceInstance -> {
+            JSONObject deviceInstanceObject = deviceInstance.toJSON();
+            String sceneSchemeBy = deviceInstanceObject.getString("sceneSchemeBy");
+            SceneScheme sceneScheme = sceneSchemeService.getById(sceneSchemeBy);
+            deviceInstanceObject.put("sceneSchemeName", sceneScheme != null?sceneScheme.getName():sceneSchemeBy);
+
+            // 设备模型
+            DeviceModel deviceModel = deviceModelService.getById(deviceInstance.getModelBy());
+            deviceInstanceObject.put("modelFiles", deviceModel.getThreeModelFile());
+            deviceInstanceObject.put("type", deviceModel.getType());
+            deviceInstanceJsonArray.add(deviceInstanceObject);
+        });
+
+        JSONObject sceneObj = (JSONObject) JSONObject.toJSON(scene);
+        sceneObj.put("type", "scene");
+        sceneObj.put("deviceInstances", deviceInstanceJsonArray);
+        return Result.ok(sceneObj);
     }
 
     /**

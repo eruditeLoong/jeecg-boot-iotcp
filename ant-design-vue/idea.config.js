@@ -20,5 +20,5 @@ module.exports = {
             '@router': resolve('src/router'),
             '@store': resolve('src/store')
         }
-    },
+    }
 }

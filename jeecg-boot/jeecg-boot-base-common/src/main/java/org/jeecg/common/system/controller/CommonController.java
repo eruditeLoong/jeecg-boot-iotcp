@@ -189,6 +189,9 @@ public class CommonController {
 //	}
 
 	/**
+	 * update: zhouwr
+	 * update time: 2020/07/02 11:57
+	 *
 	 * 预览图片&下载文件
 	 * 请求地址：http://localhost:8080/common/static/{user/20190119/e1fe9925bc315c60addea1b98eb1cb1349547719_1547866868179.jpg}
 	 *
@@ -216,15 +219,20 @@ public class CommonController {
 				response.setStatus(404);
 				throw new RuntimeException("文件不存在..");
 			}
-			response.setContentType("application/force-download");// 设置强制下载不打开
-			response.addHeader("Content-Disposition", "attachment;fileName=" + new String(file.getName().getBytes("UTF-8"),"iso-8859-1"));
+//			response.setContentType("application/force-download"); // 设置强制下载不打开
+			response.setContentType("application/x-msdownload");   // 以流的形式下载文件
+			response.addHeader("Content-Disposition", "attachment;fileName=" + new String(file.getName().getBytes("UTF-8"), "iso-8859-1"));
+			response.addHeader("Content-Encoding", "UTF-8");
 			inputStream = new BufferedInputStream(new FileInputStream(filePath));
 			outputStream = response.getOutputStream();
 			byte[] buf = new byte[1024];
 			int len;
 			while ((len = inputStream.read(buf)) > 0) {
+				response.addHeader("Content-Length", String.valueOf(file.length()));
 				outputStream.write(buf, 0, len);
 			}
+			log.info("文件大小：{}", file.length());
+
 			response.flushBuffer();
 		} catch (IOException e) {
 			log.error("预览文件失败" + e.getMessage());

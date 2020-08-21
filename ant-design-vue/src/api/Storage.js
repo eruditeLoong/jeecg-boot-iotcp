@@ -58,29 +58,33 @@ var Storage = function () {
 
         getBig: function (id, callback) {
             let bigObj = '';
-            var transaction = database.transaction(['states'], 'readwrite')
-            var objectStore = transaction.objectStore('states')
-            console.log(objectStore)
-            let request = objectStore.index("keyIndex").openCursor();
+            return new Promise((resolve, reject) => {
+                var transaction = database.transaction(['states'], 'readwrite')
+                var objectStore = transaction.objectStore('states')
+                console.log(objectStore)
+                let index = objectStore.index("keyIndex");
+                let request = index.openCursor();
 
-            request.onsuccess = e => {
-                // console.log('遍历成功', e);
-                console.log(request)
-                if (request.result) {
+                request.onsuccess = ()=> {
+                    // console.log('遍历成功', e);
                     let cursor = request.result;
-                    if (cursor.key.indexOf(id) > -1) {
-                        bigObj += cursor.key;
-                        console.log(bigObj)
+                    if (cursor) {
+                        console.log(cursor.value.key , cursor.value.key.indexOf(id))
+                        if (cursor.value.key.indexOf(id) > -1) {
+                            bigObj += cursor.value.obj;
+                        }
+                        cursor.continue();
+                    } else {
+                        console.log("没有数据了");
+                        resolve(bigObj);
                     }
-                    cursor.continue();
-                } else {
-                    console.log("数据为空");
-                }
-            };
-            request.onerror = e => {
-                console.log("遍历失败", e);
-            };
-            return (bigObj)
+                };
+                request.onerror = e => {
+                    console.log("遍历失败", e);
+                };
+            }).then(res => {
+                callback (bigObj)
+            })
         },
 
         set: function (key, value) {
@@ -120,8 +124,8 @@ var Storage = function () {
                         console.log(i, '->', (i * size) + 1, (i + 1) * size)
                         this.set(key + '-' + i, value.substring((i * size) + 1, (i + 1) * size))
                     } else {
-                        console.log(i, '->', (i * size) + 1, len - 1)
-                        this.set(key + '-' + i, value.substring((i * size) + 1, len - 1))
+                        console.log(i, '->', (i * size) + 1, len)
+                        this.set(key + '-' + i, value.substring((i * size) + 1, len))
                     }
                 }
             }

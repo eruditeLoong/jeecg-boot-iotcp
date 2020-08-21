@@ -7,7 +7,6 @@ import com.zhouwr.protocol.utils.CRCUtil;
 import com.zhouwr.protocol.utils.HexConvertUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 
 import java.io.Serializable;
@@ -18,7 +17,7 @@ public class WIRELESS120 implements DataProtocolProvider, Serializable {
     private static final long serialVersionUID = 1L;
 
     @Override
-    public JSONArray decoder(ByteBuf msg) throws Exception{
+    public JSONArray decoder(ByteBuf msg) throws Exception {
 
         byte[] bytes = ByteBufUtil.getBytes(msg);
         JSONArray array = new JSONArray();
@@ -41,7 +40,7 @@ public class WIRELESS120 implements DataProtocolProvider, Serializable {
             /* 报文内容计算CRC字符 */
             String destCRC = HexConvertUtil.BinaryToHexString(HexConvertUtil.hexStringToBytes(CRCUtil.getCRC(b)));
             if (!srcCRC.equals(destCRC)) {
-                throw new RuntimeException ("CRC校验错误！");
+                throw new RuntimeException("CRC校验错误！");
             }
 
             /* 数据字节数量 */
@@ -59,10 +58,12 @@ public class WIRELESS120 implements DataProtocolProvider, Serializable {
 
                 JSONObject json = new JSONObject();
                 json.put("type", "data");
-                json.put("inputMode", "report");
-                json.put("deviceInstanceId", "device-" + ((i + 2) / 2));
+                json.put("deviceInstanceId", "temperature-" + ((i + 2) / 2));
                 json.put("datetime", System.currentTimeMillis());
-                json.put("dataMap", new JSONObject().put("temperature", t / 10.0));
+                JSONObject dataObj = new JSONObject();
+                dataObj.put("temperature", t / 10.0);
+                dataObj.put("inputMode", "report");
+                json.put("dataMap", dataObj);
 
                 array.add(json);
             }

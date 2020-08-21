@@ -18,6 +18,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.StringJoiner;
 
 /**
  * @Description: 设备实例
@@ -92,6 +93,15 @@ public class DeviceInstance implements Serializable {
     @ApiModelProperty(value = "实例状态")
     private String status;
 
+    /**
+     * 状态更新日期
+     */
+    @Excel(name = "状态更新日期", width = 20, format = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @ApiModelProperty(value = "状态更新日期")
+    private Date statusUpdateTime;
+
     @Excel(name = "扩展参数", width = 30)
     @ApiModelProperty(value = "扩展参数")
     private String extendParams;
@@ -131,5 +141,31 @@ public class DeviceInstance implements Serializable {
     @ApiModelProperty(value = "说明")
     private String description;
 
+    @Excel(name = "功能执行配置", width = 15)
+    @ApiModelProperty(value = "功能执行配置")
     private String funcExecConf;
+
+    public JSONObject toJSON() {
+        JSONObject json = new JSONObject();
+
+        json.put("id", id);
+        json.put("parentBy", parentBy);
+        json.put("code", code);
+        json.put("name", name);
+        json.put("modelBy", modelBy);
+        json.put("sceneBy", sceneBy);
+        json.put("sceneSchemeBy", sceneSchemeBy);
+        json.put("sysOrgCode", sysOrgCode);
+        json.put("status", status);
+        json.put("statusUpdateTime", statusUpdateTime);
+        json.put("extendParams", JSONObject.parseObject(extendParams));
+        json.put("createBy", createBy);
+        json.put("createTime", createTime);
+        json.put("updateBy", updateBy);
+        json.put("updateTime", updateTime);
+        json.put("description", description);
+        json.put("funcExecConf", funcExecConf);
+
+        return json;
+    }
 }

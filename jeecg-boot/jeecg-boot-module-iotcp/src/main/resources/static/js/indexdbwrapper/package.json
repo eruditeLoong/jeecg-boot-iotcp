@@ -1,0 +1,43 @@
+{
+  "_from": "indexdbwrapper",
+  "_id": "indexdbwrapper@1.0.4",
+  "_inBundle": false,
+  "_integrity": "sha1-otzo9+Z9iTMeh3JmNvpn+0cvCz4=",
+  "_location": "/indexdbwrapper",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "tag",
+    "registry": true,
+    "raw": "indexdbwrapper",
+    "name": "indexdbwrapper",
+    "escapedName": "indexdbwrapper",
+    "rawSpec": "",
+    "saveSpec": null,
+    "fetchSpec": "latest"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "https://registry.npm.taobao.org/indexdbwrapper/download/indexdbwrapper-1.0.4.tgz",
+  "_shasum": "a2dce8f7e67d89331e87726636fa67fb472f0b3e",
+  "_spec": "indexdbwrapper",
+  "_where": "/Users/zhouwenrong/IdeaProjects/jeecg-boot-iotcp/jeecg-boot/jeecg-boot-module-iotcp/src/main/resources/static",
+  "author": {
+    "name": "lecepin"
+  },
+  "bundleDependencies": false,
+  "deprecated": false,
+  "description": "indexDBWrapper",
+  "license": "ISC",
+  "main": "index.js",
+  "name": "indexdbwrapper",
+  "repository": {
+    "type": "git",
+    "url": "git@gitee.com:lecepin/IndexDBWrapper.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "version": "1.0.4"
+}

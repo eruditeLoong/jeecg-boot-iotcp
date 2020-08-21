@@ -201,12 +201,12 @@ export default {
             // 展开的行
             expandedRowKeys: [],
             url: {
-                list: '/scene/scene/list',
-                countScheme: '/scene/scene/countScheme',
-                delete: '/scene/scene/delete',
-                deleteBatch: '/scene/scene/deleteBatch',
-                exportXlsUrl: '/scene/scene/exportXls',
-                importExcelUrl: '/scene/scene/importExcel'
+                list: '/scene/manage/list',
+                countScheme: '/scene/manage/countScheme',
+                delete: '/scene/manage/delete',
+                deleteBatch: '/scene/manage/deleteBatch',
+                exportXlsUrl: '/scene/manage/exportXls',
+                importExcelUrl: '/scene/manage/importExcel'
             }
         }
     },
@@ -215,6 +215,9 @@ export default {
             return window._CONFIG['domianURL'] + this.url.importExcelUrl
         }
     },
+  /*  mounted() {
+        alert("mounted");
+    },*/
     methods: {
         handleDeploy (scene) {
             this.$refs.sceneDeploy.deploy(scene)

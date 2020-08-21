@@ -9,11 +9,11 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
 import lombok.extern.slf4j.Slf4j;
+import org.jeecg.modules.device.enums.DeviceState;
 import org.jeecg.modules.network.network.NetworkConnect;
 import org.jeecg.modules.network.network.NetworkConnectStore;
 import org.jeecg.modules.protocol.entity.ProtocolData;
 import org.jeecg.modules.protocol.service.IProtocolDataService;
-import org.jeecg.utils.HexConvertUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -40,7 +40,6 @@ public class TcpDynamicDecoder extends MessageToMessageDecoder<ByteBuf> {
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf msg, List<Object> out) throws Exception {
-        log.info("decode 接收数据：{}", HexConvertUtil.BinaryToHexString(ByteBufUtil.getBytes(msg)));
         // 获取channel
         Channel channel = ctx.channel();
         // 客户端地址
@@ -49,22 +48,33 @@ public class TcpDynamicDecoder extends MessageToMessageDecoder<ByteBuf> {
         // 根据tcp地址(host:port)拿到连接信息
         Map<String, NetworkConnect> connectMap = NetworkConnectStore.getNetworkConnectMap();
         NetworkConnect connect = connectMap.get(addr);
+
+        if (connect.getDeviceInstance() == null) {
+            log.error("{} 网络接入地址[{}]，找不到！", connect.getNetworkType(), connect.getSocketAddress().toString());
+            return;
+        } else if (DeviceState.NOT_ACTIVE.getCode().equals(connect.getDeviceInstance().getStatus())) {
+            log.error("{} 网络接入地址[{}]，未激活！", connect.getNetworkType(), connect.getSocketAddress().toString());
+            return;
+        }
+
         // 连接设备模型
         String deviceModelId = connect.getDeviceInstance().getModelBy();
+
         String deviceInstanceId = connect.getDeviceInstance().getId();
 
         ProtocolData protocolData = tcpDynamicDecoder.protocolDataService.getDeviceDataProtocol(deviceModelId);
-
+        if (protocolData == null) {
+            log.error("设备模型：[{}]的数据解析协议找不到！", deviceModelId);
+            return;
+        }
         // 验证数据协议
         if (!"private".equals(protocolData.getCode())) {
             // 自定义协议
             DataProtocolProvider protocolProvider = tcpDynamicDecoder.protocolDataService.loadDataProtocolProvider(protocolData);
             JSONArray array = protocolProvider.decoder(msg);
-            log.info("接收到数据：{}", array.toJSONString());
-
-
+            log.info("动态解码数据：{}", array);
             array.stream().forEach(o -> {
-                out.add((JSONObject) o);
+                out.add(o);
             });
 
         } else {

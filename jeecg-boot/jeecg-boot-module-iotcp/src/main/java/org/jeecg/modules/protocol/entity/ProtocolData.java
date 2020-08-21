@@ -17,7 +17,7 @@ import java.io.Serializable;
 
 /**
  * @Description: 数据解析协议
- * @Author: jeecg-boot
+ * @Author: 周文荣
  * @Date:   2020-04-19
  * @Version: V1.0
  */
