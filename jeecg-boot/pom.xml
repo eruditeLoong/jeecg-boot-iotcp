@@ -66,7 +66,7 @@
         <commons.version>2.6</commons.version>
         <aliyun-java-sdk-dysmsapi.version>1.0.0</aliyun-java-sdk-dysmsapi.version>
         <aliyun.oss.version>3.6.0</aliyun.oss.version>
-        <guava.version>26.0-jre</guava.version>
+        <guava.version>29.0-jre</guava.version>
         <!-- zhouwr -->
         <ch.qos.logback.version>1.2.3</ch.qos.logback.version>
     </properties>
