@@ -43,7 +43,7 @@
     "@toast-ui/editor": "^2.1.2",
     "vue-area-linkage": "^5.1.0",
     "area-data": "^5.0.6",
-    "jsoneditor": "^9.0.0"
+    "jsoneditor": "^9.5.6"
   },
   "devDependencies": {
     "@babel/polyfill": "^7.2.5",
